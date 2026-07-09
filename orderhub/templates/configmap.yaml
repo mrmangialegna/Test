@@ -1,12 +1,13 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-config
+  name: orderhub-config
+  namespace: {{ include "orderhub.namespace" . }}
+  labels:
+    {{- include "orderhub.labels" . | nindent 4 }}
 data:
-  db-host: {{ .Values.db-host }}
-  db-port: {{ .values.db-port }}
-  db-user: {{ .Values.db-user }}
-  db-name: {{ .Values.db-user }}
-  log-level: {{ .Values.log-leve}}
-
-  
+  db-host: {{ .Values.config.dbHost | quote }}
+  db-port: {{ .Values.config.dbPort | quote }}
+  db-user: {{ .Values.config.dbUser | quote }}
+  db-name: {{ .Values.config.dbName | quote }}
+  log-level: {{ .Values.config.logLevel | quote }}

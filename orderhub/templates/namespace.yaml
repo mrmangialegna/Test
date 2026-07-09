@@ -1,5 +1,8 @@
+{{- if .Values.namespace.create }}
 apiVersion: v1
 kind: Namespace
-metadata: 
-  name: {{ .Values.namespace.name }}
-  
+metadata:
+  name: {{ include "orderhub.namespace" . }}
+  labels:
+    {{- include "orderhub.labels" . | nindent 4 }}
+{{- end }}

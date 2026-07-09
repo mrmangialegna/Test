@@ -1,11 +1,12 @@
+{{- if .Values.resourceQuota.enabled }}
 apiVersion: v1
 kind: ResourceQuota
 metadata:
-  name:  {{ .Release.Name }}-config
-  namespace: {{ .Values.namespace.name }}
+  name: {{ .Values.resourceQuota.name }}
+  namespace: {{ include "orderhub.namespace" . }}
+  labels:
+    {{- include "orderhub.labels" . | nindent 4 }}
 spec:
   hard:
-    requests.cpu: {{ .Values.res.quota.rc }}
-    requests.memory: {{ .Values.res.quota.rm }}
-    limits.cpu: {{ .Values.res.quota.lc}}
-    limits.memory: {{ .Values.res.quota.lm}}
+    {{- toYaml .Values.resourceQuota.hard | nindent 4 }}
+{{- end }}

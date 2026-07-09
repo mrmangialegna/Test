@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orderhub-backend
+  namespace: {{ include "orderhub.namespace" . }}
+  labels:
+    {{- include "orderhub.labels" . | nindent 4 }}
+    app: orderhub-backend
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  selector:
+    matchLabels:
+      app: orderhub-backend
+  template:
+    metadata:
+      labels:
+        app: orderhub-backend
+        {{- include "orderhub.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: orderhub-backend
+        image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+        imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
+        ports:
+        - containerPort: {{ .Values.backend.port }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.backend.readinessProbe.path }}
+            port: {{ .Values.backend.readinessProbe.port }}
+          initialDelaySeconds: {{ .Values.backend.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.backend.readinessProbe.periodSeconds }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.backend.livenessProbe.path }}
+            port: {{ .Values.backend.livenessProbe.port }}
+          initialDelaySeconds: {{ .Values.backend.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.backend.livenessProbe.periodSeconds }}
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: orderhub-config
+              key: db-host
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: orderhub-config
+              key: db-port
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: orderhub-config
+              key: db-user
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: orderhub-config
+              key: db-name
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: orderhub-config
+              key: log-level
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: orderhub-secret
+              key: db-password

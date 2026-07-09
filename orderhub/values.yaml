@@ -1,51 +1,129 @@
+# Default values for orderhub Helm chart.
+# Override with: helm install orderhub . -f my-values.yaml -n orderhub-staging --create-namespace
+
+nameOverride: ""
+fullnameOverride: ""
+
 namespace:
-  name: "orderhub-staging"
-
-res.quota:
-  rc: "4"
-  rm: "8Gi"
-  lc: "8"
-  lm: "16Gi"
-
-l.range:
-  def:
-     m: "256Mi"
-     c: "256m"
-  defReq:
-     m: "128Mi"
-     c: "125m"
-  max:
-     m: "1Gi"
-     c: "1"
-  min:
-     m: "64Mi"
-     c: "50m"
-
-db:
-  replicas: 1
-  storage: 1Gi
-
-backend:
-  replicas: 3
+  create: true
+  name: orderhub-staging
 
 frontend:
   replicas: 2
+  image:
+    repository: orderhub-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 100m
+    limits:
+      memory: 128Mi
+      cpu: 200m
+  port: 80
+  readinessProbe:
+    path: /
+    port: 80
+    initialDelaySeconds: 5
+    periodSeconds: 5
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
 
-db-host: "orderhub-db-svc"
-db-port: "5432"
-db-user: "postgres"
-db-name: "orderhub"
-log-level: "info"
+backend:
+  replicas: 3
+  image:
+    repository: orderhub-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 125m
+    limits:
+      memory: 256Mi
+      cpu: 250m
+  port: 80
+  readinessProbe:
+    path: /
+    port: 80
+    initialDelaySeconds: 5
+    periodSeconds: 5
+  livenessProbe:
+    path: /
+    port: 80
+    initialDelaySeconds: 10
+    periodSeconds: 10
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+
+database:
+  replicas: 1
+  image:
+    repository: postgres
+    tag: "15"
+    pullPolicy: IfNotPresent
+  initContainer:
+    image: busybox
+    pullPolicy: IfNotPresent
+  storage: 1Gi
+  storageClassName: ""
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  port: 5432
+  service:
+    port: 5432
+    targetPort: 5432
+  probes:
+    user: postgres
+    liveness:
+      initialDelaySeconds: 30
+      periodSeconds: 5
+    readiness:
+      initialDelaySeconds: 10
+      periodSeconds: 5
+
+config:
+  dbHost: orderhub-db-svc
+  dbPort: "5432"
+  dbUser: postgres
+  dbName: orderhub
+  logLevel: info
 
 secret:
-  password: "abracadabra"
+  dbPassword: abracadabra
 
-service.db:
-  clusterIP: "None"
-  selector:
-    app: orderhub-db
-  ports:
-  - port: 5432
-    targetPort: 5432 
+limitRange:
+  enabled: true
+  name: limrange
+  container:
+    defaultRequest:
+      memory: 128Mi
+      cpu: 125m
+    default:
+      memory: 256Mi
+      cpu: 256m
+    min:
+      memory: 64Mi
+      cpu: 50m
+    max:
+      memory: 1Gi
+      cpu: "1"
 
- 
+resourceQuota:
+  enabled: true
+  name: resquota
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi

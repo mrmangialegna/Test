@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: orderhub-db
+  namespace: {{ include "orderhub.namespace" . }}
+  labels:
+    {{- include "orderhub.labels" . | nindent 4 }}
+    app: orderhub-db
+spec:
+  selector:
+    matchLabels:
+      app: orderhub-db
+  serviceName: orderhub-db-svc
+  replicas: {{ .Values.database.replicas }}
+  template:
+    metadata:
+      labels:
+        app: orderhub-db
+        {{- include "orderhub.selectorLabels" . | nindent 8 }}
+    spec:
+      initContainers:
+      - name: init-db
+        image: {{ .Values.database.initContainer.image }}
+        imagePullPolicy: {{ .Values.database.initContainer.pullPolicy }}
+        command: ["/bin/sh", "-c"]
+        args:
+        - echo "OrderHub DB init done" > /init-log/init.txt
+        volumeMounts:
+        - name: init-log
+          mountPath: /init-log
+      containers:
+      - name: orderhub-db
+        image: "{{ .Values.database.image.repository }}:{{ .Values.database.image.tag }}"
+        imagePullPolicy: {{ .Values.database.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.database.port }}
+          name: postgres
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - {{ .Values.database.probes.user }}
+          initialDelaySeconds: {{ .Values.database.probes.liveness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.database.probes.liveness.periodSeconds }}
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - {{ .Values.database.probes.user }}
+          initialDelaySeconds: {{ .Values.database.probes.readiness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.database.probes.readiness.periodSeconds }}
+        volumeMounts:
+        - name: pgdata
+          mountPath: /var/lib/postgresql/data
+        resources:
+          {{- toYaml .Values.database.resources | nindent 10 }}
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: orderhub-secret
+              key: db-password
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: orderhub-config
+              key: db-name
+      volumes:
+      - name: init-log
+        emptyDir: {}
+  volumeClaimTemplates:
+  - metadata:
+      name: pgdata
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      {{- with .Values.database.storageClassName }}
+      storageClassName: {{ . | quote }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.database.storage }}
