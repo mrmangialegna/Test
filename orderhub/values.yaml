@@ -71,7 +71,8 @@ database:
     image: busybox
     pullPolicy: IfNotPresent
   storage: 1Gi
-  storageClassName: ""
+
+  storageClassName: gp2
   resources:
     requests:
       cpu: 250m
