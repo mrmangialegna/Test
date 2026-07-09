@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "shopsync.fullname" . }}-test-connection"
+  labels:
+    {{- include "shopsync.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ .Values.servicebk.name }}:{{ .Values.servicebk.port }}']
+  restartPolicy: Never

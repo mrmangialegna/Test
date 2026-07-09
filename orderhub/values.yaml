@@ -1,0 +1,51 @@
+namespace:
+  name: "orderhub-staging"
+
+res.quota:
+  rc: "4"
+  rm: "8Gi"
+  lc: "8"
+  lm: "16Gi"
+
+l.range:
+  def:
+     m: "256Mi"
+     c: "256m"
+  defReq:
+     m: "128Mi"
+     c: "125m"
+  max:
+     m: "1Gi"
+     c: "1"
+  min:
+     m: "64Mi"
+     c: "50m"
+
+db:
+  replicas: 1
+  storage: 1Gi
+
+backend:
+  replicas: 3
+
+frontend:
+  replicas: 2
+
+db-host: "orderhub-db-svc"
+  db-port: "5432"
+  db-user: "postgres"
+  db-name: "orderhub"
+  log-level: "info"
+
+secret:
+  password: "abracadabra"
+
+service.db:
+  clusterIP: None
+    selector:
+      app: orderhub-db
+    ports:
+    - port: 5432
+      targetPort: 5432 
+
+ 

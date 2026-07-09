@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/valpha1
+kind: Application
+metadata:
+  name: shopsync
+  namespace: argocd
+spec:
+  source:
+    repoURL: https://github.com/tuo-team/shopsync-config.git
+    targetRevision: main
+    path: shopsync-helm
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: shopsync-staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

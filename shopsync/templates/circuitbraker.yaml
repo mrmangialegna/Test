@@ -1,0 +1,17 @@
+apiVersion: mesh.traefik.io/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: {{ .Values.circuit.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  destination:
+    services:
+    - name: {{ .Values.servicebk.name }}
+      port: {{ .Values.servicebk.port }}
+  circuitBreaker:
+    maxConnections: {{ .Values.circuit.max }}
+    maxPendingRequests: {{ .Values.circuit.wait }}
+    maxRetries: {{ .Values.circuit.retry }}
+    maxErrors: {{ .Values.circuit.error }}
+    interval: {{ .Values.circuit.terror }}
+    baseEjectionTime: {{ .Values.circuit.pause }}

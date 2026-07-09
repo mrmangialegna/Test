@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.cmap.mapname }}
+  namespace: {{ .Values.namespace.name }}
+data: 
+  config:
+    host: {{ .Values.cmap.host}}
+    port: {{ .Values.cmap.port}}
+    name: {{ .Values.cmap.name}}
+    user: {{ .Values.cmap.user}}
+    log: {{ .Values.cmap.log}}

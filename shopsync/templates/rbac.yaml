@@ -1,0 +1,35 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace.name }}
+  name: {{ .Values.rback.rolename }}
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: {{ .Values.rback.resources }}
+  verbs: {{ .Values.rback.verbs }}
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: {{ .Values.namespace.name }}
+  name: {{ .Values.rback.sa }}
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.rback.rb }}
+  namespace: {{ .Values.namespace.name }}
+subjects:
+  - kind: ServiceAccount   
+    name: {{ .Values.rback.sa }}      
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: {{ .Values.rback.rolename }}
+  apiGroup: rbac.authorization.k8s.io 
+
+  

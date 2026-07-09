@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: {{ .Release.Name}}-config
+  namespace: {{ .Values.namespace.name }}
+spec:
+  limits:
+  - type: Container 
+    default:
+      memory: {{ .Values.l.range.def.m }}
+      cpu: {{ .Values.l.range.def.c }}
+    defaultRequest:
+      memory: {{ .Values.l.range.defReq.m  }}
+      cpu: {{ .Values.l.range.defReq.c  }}
+    max:
+      memory: {{ .Values.l.range.max.m  }}
+      cpu: {{ .Values.l.range.max.c  }}
+    min:
+      memory: {{ .Values.l.range.min.m  }}
+      cpu: {{ .Values.l.range.min.c  }}

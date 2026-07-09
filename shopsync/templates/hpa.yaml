@@ -1,0 +1,54 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.hpa.backname }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.backend.name }}
+  minReplicas: {{ .Values.hpa.backrmin }}
+  maxReplicas: {{ .Values.hpa.backrmax }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.hpa.backav }}
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: {{ .Values.hpa.backSDstab }}
+      policies:
+      - type: Pods
+        value: {{ .Values.hpa.backSDvalue }}
+        periodSeconds: {{ .Values.hpa.backSDsec }}
+    scaleUp:
+      stabilizationWindowSeconds: {{ .Values.hpa.backSUstab }}
+      policies:
+      - type: Pods
+        value: {{ .Values.hpa.backSUvalue }}
+        periodSeconds: {{ .Values.hpa.backSUsec }}
+
+---
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.hpa.frontname }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.frontend.name }}
+  minReplicas: {{ .Values.hpa.frontrmin }}
+  maxReplicas: {{ .Values.hpa.frontrmax }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.hpa.frontav }}

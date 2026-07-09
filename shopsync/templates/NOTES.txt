@@ -1,0 +1,7 @@
+ShopSync deployed in namespace {{ .Values.namespace.name }}.
+
+Frontend service: {{ .Values.servicefrt.name }}:{{ .Values.servicefrt.port }}
+Backend service:  {{ .Values.servicebk.name }}:{{ .Values.servicebk.port }}
+
+Port-forward the frontend:
+  kubectl -n {{ .Values.namespace.name }} port-forward svc/{{ .Values.servicefrt.name }} 8080:{{ .Values.servicefrt.port }}

@@ -1,0 +1,16 @@
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:18-alpine
+RUN addgroup -S shopgroup && adduser -S shopuser -G shopgroup
+WORKDIR /app
+COPY --from=builder --chown=shopuser:shopgroup /app/dist ./dist
+COPY --from=builder --chown=shopuser:shopgroup /app/node_modules ./node_modules
+COPY --from=builder --chown=shopuser:shopgroup /app/package.json ./
+USER shopuser
+EXPOSE 3000
+CMD ["node", "dist/main"]

@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.stateful.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  replicas: {{ .Values.stateful.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.stateful.cname }}
+  serviceName: {{ .Values.servicedb.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.stateful.cname }}
+    spec:
+      initContainers:
+      - name: init-db
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+          - echo "ShopSync DB Ready" > /init-log/init.txt
+        volumeMounts:
+        - name: init-log
+          mountPath: /init-log
+      containers:
+      - name: {{ .Values.stateful.cname }}
+        image: {{ .Values.stateful.cimage }}
+        ports:
+        - containerPort: {{ .Values.stateful.cport }}
+        resources:
+          requests:
+            memory: {{ .Values.stateful.rm }}
+            cpu: {{ .Values.stateful.rc }}
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secret.secname }}
+              key: db-password
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.cmap.mapname }}
+              key: name
+      volumes:
+      - name: init-log
+        emptyDir: {}

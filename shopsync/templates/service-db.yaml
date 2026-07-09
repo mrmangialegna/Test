@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.servicedb.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  clusterIP: None
+  selector:
+    app: {{ .Values.stateful.cname }}
+  ports:
+  - port: {{ .Values.servicedb.port }}
+    targetPort: {{ .Values.servicedb.tport }}
+    

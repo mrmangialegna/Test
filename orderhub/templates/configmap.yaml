@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-config
+data:
+  db-host: {{ .Values.db-host }}
+  db-port: {{ .values.db-port }}
+  db-user: {{ .Values.db-user }}
+  db-name: {{ .Values.db-user }}
+  log-level: {{ .Values.log-leve}}
+
+  

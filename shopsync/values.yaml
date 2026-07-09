@@ -1,0 +1,128 @@
+namespace:
+  name: shopsync-staging
+
+resquota:
+  name: shopsync-quota
+  cpu: "4"
+  mem: "8Gi"
+  lcpu: "8"
+  lmem: "16Gi"
+
+limit:
+  name: lim-shopsync
+  defl:
+    m: "256Mi"
+    c: "250m"
+  defR:
+    m: "125Mi"
+    c: "125m"
+  max:
+    m: "1Gi"
+    c: "1"
+  min:
+    m: "64Mi"
+    c: "50m"
+  type: Container
+
+pss: restricted
+
+secret:
+  secname: shopsync-secret
+  pwd: abcdef 
+
+cmap:
+  mapname: shopsync-config
+  host: shopsync-db-svc
+  port: "5432"
+  name: shopsync
+  user: postgres
+  log: info
+
+servicedb:
+  name: shopsync-db-svc
+  type: None
+  port: 5432
+  tport: 5432
+
+stateful:
+  name: shopsync-db
+  replicas: 1
+  cname: shopsync-db
+  cimage: postgres15
+  cport: 5432
+  rm: "256Mi"
+  rc: "250m"
+
+servicebk:
+  name: shopsync-backend-svc
+  type: ClusterIP
+  port: 80 
+  tport: 3000
+
+backend:
+  name: shopsync-backend
+  replicas: 3
+  image: shopsync-backend:latest
+  port: 3000
+  rlm: "128Mi"
+  rlc: "125"
+  rrm: "256Mi"
+  rrc: "250m"
+
+servicefrt:
+  name: shopsync-frontend-svc
+  type: ClusterIP
+  port: 80 
+  tport: 8080
+
+frontend:
+  name: shopsync-frontend
+  replicas: 2
+  image: shopsync-frontend:latest
+  port: 8080
+  rlm: "128Mi"
+  rlc: "125"
+  rrm: "256Mi"
+  rrc: "250m"
+
+netpolicydb:
+  name: netpolicydb
+
+netpolicybackend:
+  name: netpolicyback
+
+netpolicyfrontend:
+  name: netpolicyfrontend
+
+hpa:
+  backname: hpaback
+  backrmin: "2"
+  backrmax: "10"
+  backav: 70
+  backSDstab: 300 
+  backSDvalue: 1
+  backSDsec: 60
+  backSUstab: 60
+  backSUvalue: 2
+  backSUsec: 30
+
+  frontname: hpaback
+  frontrmin: "2"
+  frontrmax: "5"
+  frontav: 60
+  
+rback:
+  rolename: shopsync-backend-role
+  resources: ["secret", "configmap"]
+  verbs: [ "get", "list"]
+  sa: shopsync-backend-sa
+  rb: shopsync-roleBinding
+
+circuit:
+  name: shopsync-backend-cb
+  max: 100
+  wait: 50
+  retry: 3
+  error: 8
+  terror: "30s"
+  pause: "90s"
