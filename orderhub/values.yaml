@@ -32,20 +32,20 @@ frontend:
   replicas: 2
 
 db-host: "orderhub-db-svc"
-  db-port: "5432"
-  db-user: "postgres"
-  db-name: "orderhub"
-  log-level: "info"
+db-port: "5432"
+db-user: "postgres"
+db-name: "orderhub"
+log-level: "info"
 
 secret:
   password: "abracadabra"
 
 service.db:
-  clusterIP: None
-    selector:
-      app: orderhub-db
-    ports:
-    - port: 5432
-      targetPort: 5432 
+  clusterIP: "None"
+  selector:
+    app: orderhub-db
+  ports:
+  - port: 5432
+    targetPort: 5432 
 
  
