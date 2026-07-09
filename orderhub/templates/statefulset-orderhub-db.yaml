@@ -75,7 +75,7 @@ spec:
       name: pgdata
     spec:
       accessModes: ["ReadWriteOnce"]
-      storageClassName: {{ required "database.storageClassName must be set — run: kubectl get storageclass" .Values.database.storageClassName | quote }}
+      storageClassName: {{ required "storageClass.name o database.storageClassName deve essere impostato" (include "orderhub.database.storageClassName" .) | quote }}
       resources:
         requests:
           storage: {{ .Values.database.storage }}

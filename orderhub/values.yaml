@@ -71,8 +71,8 @@ database:
     image: busybox
     pullPolicy: IfNotPresent
   storage: 1Gi
-
-  storageClassName: gp2
+  # Se vuoto, usa storageClass.name (definita sotto).
+  storageClassName: ""
   resources:
     requests:
       cpu: 250m
@@ -128,3 +128,15 @@ resourceQuota:
     requests.memory: 8Gi
     limits.cpu: "8"
     limits.memory: 16Gi
+
+# StorageClass + provisioner per cluster senza storage dinamico (es. Proxmox bare metal).
+# Crea volumi locali sul nodo in nodePath (default /opt/local-path-provisioner).
+storageClass:
+  create: true
+  name: local-path
+  default: true
+  provisioner:
+    enabled: true
+    namespace: local-path-storage
+    image: rancher/local-path-provisioner:v0.0.28
+    nodePath: /opt/local-path-provisioner
