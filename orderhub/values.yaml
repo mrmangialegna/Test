@@ -11,7 +11,7 @@ namespace:
 frontend:
   replicas: 2
   image:
-    repository: 192.168.1.23:5000/orderhub-frontend
+    repository: 192.168.0.23:5000/orderhub-frontend
     tag: latest
     pullPolicy: IfNotPresent
   resources:
@@ -35,7 +35,7 @@ frontend:
 backend:
   replicas: 3
   image:
-    repository: 192.168.1.23:5000/orderhub-backend
+    repository: 192.168.0.23:5000/orderhub-backend
     tag: latest
     pullPolicy: IfNotPresent
   resources:
