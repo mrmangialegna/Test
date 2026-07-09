@@ -1,15 +1,15 @@
-{{- if .Values.storageClass.create }}
+{{- if .Values.storage.enabled }}
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: {{ .Values.storageClass.name }}
+  name: {{ .Values.storage.className }}
   labels:
     {{- include "orderhub.labels" . | nindent 4 }}
-  {{- if .Values.storageClass.default }}
+  {{- if .Values.storage.default }}
   annotations:
     storageclass.kubernetes.io/is-default-class: "true"
   {{- end }}
-provisioner: rancher.io/local-path
+provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
-reclaimPolicy: Delete
+reclaimPolicy: Retain
 {{- end }}

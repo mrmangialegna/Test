@@ -1,0 +1,17 @@
+{{- if and .Values.storage.enabled .Values.storage.pvc.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.storage.pvc.name }}
+  namespace: {{ include "orderhub.namespace" . }}
+  labels:
+    {{- include "orderhub.labels" . | nindent 4 }}
+    app: orderhub-db
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.storage.className }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.pvc.size }}
+{{- end }}

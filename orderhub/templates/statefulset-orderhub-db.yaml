@@ -70,12 +70,6 @@ spec:
       volumes:
       - name: init-log
         emptyDir: {}
-  volumeClaimTemplates:
-  - metadata:
-      name: pgdata
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      storageClassName: {{ required "storageClass.name o database.storageClassName deve essere impostato" (include "orderhub.database.storageClassName" .) | quote }}
-      resources:
-        requests:
-          storage: {{ .Values.database.storage }}
+      - name: pgdata
+        persistentVolumeClaim:
+          claimName: {{ .Values.database.pvc.name }}

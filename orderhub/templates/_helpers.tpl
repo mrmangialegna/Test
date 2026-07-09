@@ -56,8 +56,8 @@ Target namespace for all resources.
 {{- end }}
 
 {{/*
-StorageClass usata dal database (database.storageClassName o storageClass.name).
+StorageClass usata dal database.
 */}}
 {{- define "orderhub.database.storageClassName" -}}
-{{- .Values.database.storageClassName | default .Values.storageClass.name -}}
+{{- .Values.database.storageClassName | default .Values.storage.className -}}
 {{- end }}

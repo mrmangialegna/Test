@@ -71,8 +71,9 @@ database:
     image: busybox
     pullPolicy: IfNotPresent
   storage: 1Gi
-  # Se vuoto, usa storageClass.name (definita sotto).
   storageClassName: ""
+  pvc:
+    name: pgdata
   resources:
     requests:
       cpu: 250m
@@ -129,14 +130,16 @@ resourceQuota:
     limits.cpu: "8"
     limits.memory: 16Gi
 
-# StorageClass + provisioner per cluster senza storage dinamico (es. Proxmox bare metal).
-# Crea volumi locali sul nodo in nodePath (default /opt/local-path-provisioner).
-storageClass:
-  create: true
-  name: local-path
+storage:
+  enabled: true
+  className: proxmox-local
   default: true
-  provisioner:
+  pv:
     enabled: true
-    namespace: local-path-storage
-    image: rancher/local-path-provisioner:v0.0.28
-    nodePath: /opt/local-path-provisioner
+    name: orderhub-db-pv
+    hostPath: /mnt/data/orderhub-db
+    size: 1Gi
+  pvc:
+    enabled: true
+    name: pgdata
+    size: 1Gi

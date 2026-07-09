@@ -1,0 +1,19 @@
+{{- if and .Values.storage.enabled .Values.storage.pv.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.storage.pv.name }}
+  labels:
+    {{- include "orderhub.labels" . | nindent 4 }}
+    app: orderhub-db
+spec:
+  capacity:
+    storage: {{ .Values.storage.pv.size }}
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: {{ .Values.storage.className }}
+  hostPath:
+    path: {{ .Values.storage.pv.hostPath }}
+    type: DirectoryOrCreate
+{{- end }}
