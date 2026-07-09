@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.frontend.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.frontend.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.frontend.name }}
+    spec:
+      containers:
+        
+        - name: {{ .Values.frontend.name }}
+          image: {{ .Values.frontend.image }}
+          ports:
+            - containerPort: {{ .Values.frontend.port }}
+          resources:
+            requests:
+              memory: {{ .Values.frontend.resources.reqm }}
+              cpu: {{ .Values.frontend.resources.reqc }}
+            limits:
+              memory: {{ .Values.frontend.resources.limm }}
+              cpu: {{ .Values.frontend.resources.limc }}
+          
+          readinessProbe:
+          httpGet:
+            path: {{ .Values.frontend.readiness.path }}
+            port: {{ .Values.frontend.readiness.port }}
+          initialDelaySeconds: {{ .Values.frontend.readiness.id }}
+
+          env:
+            - name: {{ .Values.frontend.env.host }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.configmap.name }}
+                  key: {{ .Values.configmap.dbhost }}
+            - name: {{ .Values.frontend.env.port }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.configmap.name }}
+                  key: {{ .Values.configmap.dbport }}
+            - name: {{ .Values.frontend.env.user }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.configmap.name }}
+                  key: {{ .Values.configmap.dbuser }}
+            - name: {{ .Values.frontend.env.password }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: {{ .Values.secret.dbpassword }}
+            - name: {{ .Values.frontend.env.dbname }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.configmap.name }}
+                  key: {{ .Values.configmap.dbname }}

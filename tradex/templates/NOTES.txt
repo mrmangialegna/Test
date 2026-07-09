@@ -1,0 +1,25 @@
+Tradex è stato installato nel namespace {{ include "tradex.namespace" . }}.
+
+{{- if .Values.ingressRoute.enabled }}
+
+  URL applicazione (Traefik IngressRoute):
+    http://{{ .Values.ingressRoute.host }}
+
+  Verifica la route:
+    kubectl get ingressroute tradex-frontend-route -n {{ include "tradex.namespace" . }}
+
+{{- else }}
+
+  Port-forward al frontend:
+    kubectl port-forward -n {{ include "tradex.namespace" . }} svc/tradex-frontend-svc 8080:{{ .Values.frontend.service.port }}
+    echo "Visita http://127.0.0.1:8080"
+
+{{- end }}
+
+  Componenti deployati:
+    - Frontend:  {{ .Values.frontend.replicas }} repliche ({{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }})
+    - Backend:   {{ .Values.backend.replicas }} repliche ({{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }})
+    - Database:  {{ .Values.database.replicas }} replica/e ({{ .Values.database.image.repository }}:{{ .Values.database.image.tag }})
+
+  Stato dei pod:
+    kubectl get pods -n {{ include "tradex.namespace" . }}

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configmap.name }}
+  namespace: {{ .Values.namespace.name }}
+data:
+  db-host: {{ .Values.configmap.dbhost }}
+  db-port: {{ .Values.configmap.dbport }}
+  db-name: {{ .Values.configmap.dbname }}
+  db-user: {{ .Values.configmap.dbuser }}
+  aggregator-port: {{ .Values.configmap.aggregatorport }}
+  view-port: {{ .Values.configmap.viewport }}
+  db-password: {{ .Values.configmap.dbpassword }}

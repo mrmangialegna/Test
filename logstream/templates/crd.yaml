@@ -1,0 +1,33 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: logstreams.{{ .Values.crd.group }}.{{ .Values.crd.version }}
+spec:
+  group: {{ .Values.crd.group }}
+  version: {{ .Values.crd.version }}
+  names:
+    kind: {{ .Values.crd.kind }}
+    listkind: {{ .Values.crd.kind }}List
+    plural: {{ .Values.crd.plural }}
+    singular: {{ .Values.crd.singular }}
+  scope: Namespaced
+  versions:
+    - name: {{ .Values.crd.version }}
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                dbversion:
+                  type: string
+                dbStorageSize:
+                  type: string
+                aggregatorReplicas:
+                  type: integer
+                viewerReplicas:
+                  type: integer
+                

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.operator.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  replicas: {{ .Values.operator.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.operator.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.operator.name }}
+    spec:
+      serviceAccountName: {{ .Values.serviceaccountop }}
+      containers:
+      - name: {{ .Values.operator.name }}
+        image: {{ .Values.operator.image }}
+        env:
+        - name: {{ .Values.operator.env.watch }}
+          value: {{ .Values.operator.env.value }}

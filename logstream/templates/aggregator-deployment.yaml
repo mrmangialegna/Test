@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deploymentaggregator.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  replicas: {{ .Values.deploymentaggregator.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.deploymentaggregator.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deploymentaggregator.name }}
+    spec:
+      containers:
+      
+        - name: {{ .Values.deploymentaggregator.name }}
+          image: {{ .Values.deploymentaggregator.image }}
+          ports:
+          - containerPort: {{ .Values.deploymentaggregator.port }}
+          resources:
+            requests:
+              memory: {{ .Values.deploymentaggregator.resources.reqm }}
+              cpu: {{ .Values.deploymentaggregator.resources.reqc }}
+            limits:
+              memory: {{ .Values.deploymentaggregator.resources.limm }}
+              cpu: {{ .Values.deploymentaggregator.resources.limc }}
+
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.deploymentaggregator.readiness.path }}
+              port: {{ .Values.deploymentaggregator.readiness.port }}
+           
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.deploymentaggregator.liveness.path }}
+              port: {{ .Values.deploymentaggregator.liveness.port }}
+            initialDelaySeconds: {{ .Values.deploymentaggregator.liveness.id }}
+          
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.configmap.name }}
+                  key: {{ .Values.configmap.dbhost }}
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.configmap.name }}
+                  key: {{ .Values.configmap.dbport }}
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.configmap.name }}
+                  key: {{ .Values.configmap.dbname }}
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.configmap.name }}
+                  key: {{ .Values.configmap.dbuser }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: {{ .Values.secret.dbpassword }}
+            - name: LISTEN
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.configmap.name }}
+                  key: {{ .Values.configmap.aggregatorport }}
+            

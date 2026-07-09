@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.statefulset.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  serviceName: {{ .Values.servicedb.name }}
+  replicas: {{ .Values.statefulset.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.statefulset.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.statefulset.name }}
+    
+    spec:
+
+      initContainers:
+      - name: 
+        image: 
+      - command: ["/bin/sh", "-c"]
+      - args:
+        - echo "LogStreamDB Init Done" > /init-log/init.txt
+      - volumeMounts:
+        - name: {{ .Values.statefulset.volumeClaims.name }}
+          mountpath: /init-log
+
+      containers:
+    
+        - name: {{ .Values.statefulset.name }}
+          image: {{ .Values.statefulset.image }}
+          ports:
+            - containerPort: {{ .Values.statefulset.port }}
+          resources:
+            requests:
+              memory: {{ .Values.statefulset.resources.reqm }}
+              cpu: {{ .Values.statefulset.resources.reqc }}
+            limits:
+              memory: {{ .Values.statefulset.resources.limm }}
+              cpu: {{ .Values.statefulset.resources.limc }}
+          
+          livenessProbe:
+            exec:
+              command:
+              - pg_isready
+              - -U
+              - postgres
+            initialDelaySeconds: {{ .Values.statefulset.livenessid }}
+
+          readinessProbe:
+            exec:
+              command:
+              - pg_isready
+              - -U
+              - postgres
+            initialDelaySeconds: {{ .Values.statefulset.readinessid }}
+
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secret.name }}
+                  key: {{ .Values.secret.dbpassword }}
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.configmap.name }}
+                  key: {{ .Values.configmap.dbname }}
+          volumeMounts:
+            - name: {{ .Values.statefulset.volumeClaims.name }}
+              mountPath: /var/lib/postgresql/data
+
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ .Values.statefulset.volumeClaims.name }}
+      spec:
+        accessModes: {{ .Values.statefulset.volumeClaims.accessModes }}
+        resources:
+          size: {{ .Values.statefulset.volumeClaims.size }}        

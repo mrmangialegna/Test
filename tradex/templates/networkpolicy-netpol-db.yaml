@@ -1,0 +1,23 @@
+{{- if .Values.networkPolicy.db.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: netpol-db
+  namespace: {{ include "tradex.namespace" . }}
+  labels:
+    {{- include "tradex.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: tradex-db
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: tradex-backend
+    ports:
+    - protocol: TCP
+      port: {{ .Values.database.port }}
+{{- end }}

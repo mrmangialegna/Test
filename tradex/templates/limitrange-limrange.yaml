@@ -1,0 +1,20 @@
+{{- if .Values.limitRange.enabled }}
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: {{ .Values.limitRange.name }}
+  namespace: {{ include "tradex.namespace" . }}
+  labels:
+    {{- include "tradex.labels" . | nindent 4 }}
+spec:
+  limits:
+  - type: Container
+    defaultRequest:
+      {{- toYaml .Values.limitRange.container.defaultRequest | nindent 6 }}
+    default:
+      {{- toYaml .Values.limitRange.container.default | nindent 6 }}
+    min:
+      {{- toYaml .Values.limitRange.container.min | nindent 6 }}
+    max:
+      {{- toYaml .Values.limitRange.container.max | nindent 6 }}
+{{- end }}

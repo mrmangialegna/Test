@@ -1,0 +1,16 @@
+{{- if .Values.trafficPolicy.enabled }}
+apiVersion: mesh.traefik.io/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: {{ .Values.trafficPolicy.name }}
+  namespace: {{ include "tradex.namespace" . }}
+  labels:
+    {{- include "tradex.labels" . | nindent 4 }}
+spec:
+  destination:
+    services:
+    - name: {{ .Values.trafficPolicy.destination.service }}
+      port: {{ .Values.trafficPolicy.destination.port }}
+  circuitBreaker:
+    {{- toYaml .Values.trafficPolicy.circuitBreaker | nindent 4 }}
+{{- end }}

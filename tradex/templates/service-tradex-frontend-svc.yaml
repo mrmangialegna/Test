@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tradex-frontend-svc
+  namespace: {{ include "tradex.namespace" . }}
+  labels:
+    {{- include "tradex.labels" . | nindent 4 }}
+    app: tradex-frontend
+spec:
+  type: {{ .Values.frontend.service.type }}
+  selector:
+    app: tradex-frontend
+  ports:
+  - port: {{ .Values.frontend.service.port }}
+    targetPort: {{ .Values.frontend.service.targetPort }}

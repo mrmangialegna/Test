@@ -1,0 +1,64 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.networkpolicydb.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Values.statefulset.name }}
+  policyTypes:
+    - Ingress
+  ingress:
+
+    - from:
+      - podSelector:
+        matchLabels:
+          app: {{ .Values.deploymentaggregator.name }}
+      ports:
+        port: {{ .Values.networkpolicydb.port }}
+        protocol: {{ .Values.networkpolicydb.protocol }}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.networkpolicybackend.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Values.deploymentaggregator.name }}
+  policyTypes:
+    - Ingress
+
+  ingress:
+    - from:
+      - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: ingress-nginx
+      ports:
+        port: {{ .Values.networkpolicybackend.port }}
+        protocol: {{ .Values.networkpolicybackend.protocol }}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.networkpolicyfrontend.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Values.frontend.name }}
+  policyTypes:
+    - Ingress
+
+  ingress:
+    - from:
+      - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: ingress-nginx
+      ports:
+        - port: {{ .Values.networkpolicyfrontend.port }}
+          protocol: {{ .Values.networkpolicyfrontend.protocol }}

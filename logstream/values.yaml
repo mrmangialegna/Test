@@ -1,0 +1,246 @@
+#namespace
+namespace:
+  name: logstream-staging
+
+#resquota
+resourceQuota:
+  name: logstream-staging-resource-quota
+  hard:
+    requestscpu: "4"
+    requestsmemory: "8Gi"
+    limitscpu: "8"
+    limitsmemory: "16Gi"
+#limitrange
+limitRange:
+  name: logstream-staging-limit-range
+  default:
+    memory: "128Mi"
+    cpu: "125m"
+  defaultRequest:
+    memory: "128Mi"
+    cpu: "125m"
+  max:
+    memory: "1Gi"
+    cpu: "50m"
+  min:
+    memory: "64Mi"
+    cpu: "125m"
+  type: Container
+
+#secret
+secret:
+  name: logstream-secret
+  dbpassword: abc123
+
+#configmap
+configmap:
+  name: logstream-config
+  dbhost: "servicedb.name"
+  dbport: 5432
+  dbname: "logstreamdb"
+  dbuser: "postgres"
+  aggregator-port: "4000"
+  viewport: "8080"
+  dbpassword: abc123
+
+#servicedb
+servicedb:
+  name: logstream-db-svc
+  app: logstream-db
+  port: 5432
+  protocol: TCP
+  targetport: 5432
+  clusterIP: None
+
+#statefulset
+statefulset:
+
+  volumeClaims:
+    name: pgdata
+    size: "10Gi"
+    accessModes: [ReadWriteOnce]
+
+  name: logstream-db
+  replicas: 1
+  c.name: logstream-db
+  image: postgres:15
+  port: "servicedb.port"
+  
+  env:
+    pwd: POSTGRES_PASSWORD
+    name: POSTGRES_DB
+  
+  volumeMounts:
+    - name: "volumeClaims.name"
+      mountPath: /var/lib/postgresql/data
+      
+  resources:
+    reqc: 250m
+    reqm: 256Mi
+    limc: 250m
+    limm: 256Mi
+  
+  
+  livenessid: 30
+  readinessid: 10
+
+#servicebackend
+servicebackend:
+  name: logstream-aggregator-svc
+  port: 4000
+  targetport: 4000
+  type: ClusterIP
+
+#backend
+deploymentaggregator:
+  name: logstream-aggregator
+  replicas: 2
+  image: logstream-aggregator:latest
+  port: "servicebackend.port"
+  env:
+    host: "servicedb.name"
+    port: "servicedb.port"
+    user: "configmap.dbuser"
+    password: "secret.dbpassword"
+    dbname: "configmap.dbname"
+    listen: "configmap.aggregatorport"
+  
+  resources:
+    reqc: 125m
+    reqm: 128Mi
+    limc: 250m
+    limm: 256Mi
+  
+  liveness:
+    path: /health
+    port: 4000
+    id: 15
+  readiness:
+    path: /ready
+    port: 4000
+
+#servicefrontend
+servicefrontend:
+  name: logstream-viewer-svc
+  port: 8080
+  targetport: 30080
+  type: NodePort
+
+#frontend
+frontend:
+  name: logstream-viewer
+  replicas: 2
+  image: logstream-viewer:latest
+  port: "servicefrontend.port"
+  env:
+    host: "servicebackend.name"
+    port: "servicebackend.port"
+    user: "configmap.dbuser"
+    password: "secret.dbpassword"
+    dbname: "configmap.dbname"
+  
+  resources:
+    reqc: 100m
+    reqm: 64Mi
+    limc: 200m
+    limm: 128Mi
+
+  readiness: 
+    path: /
+    port: 8080
+    id: 10
+
+#networkpolicydb
+networkpolicydb:
+  name: networkpolicy-db
+  app: logstream-aggregator    
+  port: 5432
+  protocol: TCP
+
+#networkpolicybackend
+networkpolicybackend:
+  name: networkpolicy-backend
+  matchLabels:
+    app.kubernetes.io/name: ingress-nginx
+  port: 4000
+  protocol: TCP
+    
+#networkpolicyfrontend
+networkpolicyfrontend:
+  name: networkpolicy-frontend
+  matchLabels:
+    app.kubernetes.io/name: ingress-nginx
+  port: 8080
+  protocol: TCP
+
+#rbac
+rbac:
+  name: logstream-rbac
+  rules:
+    apiGroups: [""]
+    resources: ["secrets", "configmaps"]
+    verbs: ["get", "list"]
+
+#serviceaccount
+serviceaccount:
+  name: logstream-serviceaccount
+
+#rolebinding
+rolebinding:
+  name: logstream_rolebinding
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: logstream_role
+  subjects:
+    - kind: ServiceAccount
+      name: logstream_serviceaccount
+      namespace: logstream_staging
+
+#crd      
+crd:
+  group: logs.miaazienda.com
+  kind: Logstream
+  plural: logstreams
+  version: v1
+  
+#operator
+operator:
+  name: operator_logstream
+  replicas: 1
+  image: operator_image:latest
+  env:
+    watch: WATCH_NAMESPACE
+    value: "namespace.name"
+  
+#operatorserviceaccount
+serviceaccountop:
+  name: logstream-op-sa
+  
+#roleoperator
+roleop:
+  name: role-op
+  rules:
+  - apiGroups: [""]
+    resources: ["pods", "secrets", "configmaps", "services", "persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses", "networkpolicies"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["logs.miaazienda.com"]
+    resources: ["logstreams"]
+    verbs: ["get", "list", "watch"]
+    
+#operatorRoleBinding
+operatorRoleBinding:
+  name: operatorRoleBinding
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name2: "roleop.name"
+  namesa: "serviceaccountop.name"
+  namespace: "namespace.name"
+  
+  

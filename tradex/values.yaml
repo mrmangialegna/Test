@@ -1,0 +1,191 @@
+# Default values for tradex Helm chart.
+# Override with: helm install tradex . -f my-values.yaml -n tradex-staging --create-namespace
+
+nameOverride: ""
+fullnameOverride: ""
+
+# -- Namespace configuration
+namespace:
+  # Create the Namespace resource (disable if namespace already exists)
+  create: true
+  name: tradex-staging
+
+# -- Frontend (nginx / static UI)
+frontend:
+  replicas: 3
+  image:
+    repository: tradex-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 100m
+    limits:
+      memory: 128Mi
+      cpu: 200m
+  port: 80
+  readinessProbe:
+    path: /
+    port: 80
+    initialDelaySeconds: 10
+    periodSeconds: 5
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+
+# -- Backend (API)
+backend:
+  replicas: 3
+  image:
+    repository: tradex-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 125m
+    limits:
+      memory: 256Mi
+      cpu: 250m
+  port: 5000
+  readinessProbe:
+    path: /ready
+    port: 5000
+    initialDelaySeconds: 10
+    periodSeconds: 5
+  livenessProbe:
+    path: /health
+    port: 5000
+    initialDelaySeconds: 15
+    periodSeconds: 10
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 5000
+  serviceAccount:
+    create: true
+    name: backend-sa
+  rbac:
+    create: true
+
+# -- PostgreSQL database (StatefulSet)
+database:
+  replicas: 1
+  image:
+    repository: postgres
+    tag: "15"
+    pullPolicy: IfNotPresent
+  initContainer:
+    image: busybox
+    pullPolicy: IfNotPresent
+  storage: 1Gi
+  storageClassName: ""
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  port: 5432
+  service:
+    port: 5432
+    targetPort: 5432
+  probes:
+    user: postgres
+    liveness:
+      initialDelaySeconds: 30
+      periodSeconds: 5
+    readiness:
+      initialDelaySeconds: 10
+      periodSeconds: 5
+
+# -- Application configuration (ConfigMap tradex-config)
+config:
+  dbHost: tradex-db-svc
+  dbPort: "5432"
+  dbUser: postgre
+  dbName: tradexdb
+  logLevel: info
+
+# -- Secrets (override dbPassword in production!)
+secret:
+  dbPassword: abracadabra
+
+# -- Traefik IngressRoute
+ingressRoute:
+  enabled: true
+  entryPoints:
+    - web
+  host: tradex.local
+  service: tradex-frontend-svc
+  servicePort: 80
+  rateLimit:
+    enabled: true
+    name: rate-limit-viewer
+    average: 20
+    period: 1s
+    burst: 10
+
+# -- Traefik TrafficPolicy (circuit breaker on backend)
+trafficPolicy:
+  enabled: true
+  name: aggregator-db
+  destination:
+    service: tradex-backend-svc
+    port: 80
+  circuitBreaker:
+    maxConnections: 100
+    maxPendingRequests: 50
+    maxRetries: 3
+    maxErrors: 8
+    interval: 30s
+    baseEjectionTime: 90s
+
+# -- Network policies
+networkPolicy:
+  frontend:
+    enabled: true
+    ingressFrom:
+      app.kubernetes.io/name: ingress-nginx
+  backend:
+    enabled: true
+  db:
+    enabled: true
+
+# -- Namespace resource limits
+limitRange:
+  enabled: true
+  name: limrange
+  container:
+    defaultRequest:
+      memory: 128Mi
+      cpu: 125m
+    default:
+      memory: 256Mi
+      cpu: 250m
+    min:
+      memory: 64Mi
+      cpu: 50m
+    max:
+      memory: 1Gi
+      cpu: 1
+
+resourceQuota:
+  enabled: true
+  name: resquota
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+
+# -- Promtail log shipping config (ConfigMap only; no Promtail DaemonSet in this chart)
+promtail:
+  enabled: true
+  name: promtail-cmap
+  lokiUrl: http://loki:3100/loki/api/v1/push
+  listenPort: 9080
+  jobName: tradex-pods

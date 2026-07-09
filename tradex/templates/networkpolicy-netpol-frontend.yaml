@@ -1,0 +1,23 @@
+{{- if .Values.networkPolicy.frontend.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: netpol-frontend
+  namespace: {{ include "tradex.namespace" . }}
+  labels:
+    {{- include "tradex.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: tradex-frontend
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          {{- toYaml .Values.networkPolicy.frontend.ingressFrom | nindent 10 }}
+    ports:
+    - protocol: TCP
+      port: {{ .Values.frontend.port }}
+{{- end }}

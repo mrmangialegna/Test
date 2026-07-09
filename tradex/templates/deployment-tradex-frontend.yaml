@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tradex-frontend
+  namespace: {{ include "tradex.namespace" . }}
+  labels:
+    {{- include "tradex.labels" . | nindent 4 }}
+    app: tradex-frontend
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels:
+      app: tradex-frontend
+  template:
+    metadata:
+      labels:
+        app: tradex-frontend
+        {{- include "tradex.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: tradex-frontend
+        image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+        imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+        resources:
+          {{- toYaml .Values.frontend.resources | nindent 10 }}
+        ports:
+        - containerPort: {{ .Values.frontend.port }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.frontend.readinessProbe.path }}
+            port: {{ .Values.frontend.readinessProbe.port }}
+          initialDelaySeconds: {{ .Values.frontend.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.frontend.readinessProbe.periodSeconds }}

@@ -1,0 +1,14 @@
+{{- if and .Values.ingressRoute.enabled .Values.ingressRoute.rateLimit.enabled }}
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ .Values.ingressRoute.rateLimit.name }}
+  namespace: {{ include "tradex.namespace" . }}
+  labels:
+    {{- include "tradex.labels" . | nindent 4 }}
+spec:
+  rateLimit:
+    average: {{ .Values.ingressRoute.rateLimit.average }}
+    period: {{ .Values.ingressRoute.rateLimit.period }}
+    burst: {{ .Values.ingressRoute.rateLimit.burst }}
+{{- end }}

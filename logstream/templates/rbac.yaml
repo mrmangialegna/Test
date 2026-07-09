@@ -1,0 +1,71 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Values.rbac.name }}
+  namespace: {{ .Values.namespace.name }}
+rules:
+  - apiGroups: {{ .Values.rbac.rules.apiGroups }}
+    resources: {{ .Values.rbac.rules.resources }}
+    verbs: {{ .Values.rbac.rules.verbs }}
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.serviceaccount.name }}
+  namespace: {{ .Values.namespace.name }}
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.rolebinding.name }}
+  namespace: {{ .Values.namespace.name }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Values.rbac.name }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.serviceaccount.name }}
+    
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: 
+  name: {{ .Values.roleop.name }}
+  namespace: {{ .Values.namespace.name }}
+rules:
+{{- range .Values.roleop.rules }}
+- apiGroups:
+{{- toYaml .apiGroups | nindent 4}}
+  resources:
+{{- toYaml .resources | nindent 4 }}
+  verbs:
+{{- toYaml .verbs | nindent 4 }}
+{{- end}}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.serviceaccountop.name}}
+  namespace: {{ .Values.namespace.name}}
+  
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Values.operatorRoleBinding.name }}
+  namespace: {{ .Values.namespace.name }}
+roleRef:
+  apiGroup: {{ .Values.operatorRoleBinding.apiGroup }}
+  kind: {{ .Values.operatorRoleBinding.kind }}
+  name: {{ .Values.operatorRoleBinding.name2 }}
+subject:
+- kind: ServiceAccount
+  name: {{ .Values.operatorRoleBinding.namesa }}
+  namespace: {{ .Values.namespace.name}}

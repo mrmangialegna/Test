@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.servicedb.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  ClusterIP: {{ .Values.servicedb.clusterIP }}
+  selector:
+    app: {{ .Values.servicedb.app }}
+  ports:
+    - port: {{ .Values.servicedb.port }}
+      targetPort: {{ .Values.servicedb.targetport }}
+      protocol: {{ .Values.servicedb.protocol }}

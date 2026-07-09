@@ -1,0 +1,24 @@
+{{- if .Values.ingressRoute.enabled }}
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: tradex-frontend-route
+  namespace: {{ include "tradex.namespace" . }}
+  labels:
+    {{- include "tradex.labels" . | nindent 4 }}
+spec:
+  entryPoints:
+  {{- range .Values.ingressRoute.entryPoints }}
+  - {{ . }}
+  {{- end }}
+  routes:
+  - match: Host(`{{ .Values.ingressRoute.host }}`)
+    kind: Rule
+    services:
+    - name: {{ .Values.ingressRoute.service }}
+      port: {{ .Values.ingressRoute.servicePort }}
+    {{- if .Values.ingressRoute.rateLimit.enabled }}
+    middlewares:
+    - name: {{ .Values.ingressRoute.rateLimit.name }}
+    {{- end }}
+{{- end }}
