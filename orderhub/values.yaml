@@ -36,7 +36,7 @@ backend:
   replicas: 3
   image:
     repository: 192.168.0.23:5000/orderhub-backend
-    tag: v1.0.1
+    tag: v1.0.2
     pullPolicy: IfNotPresent
   resources:
     requests:

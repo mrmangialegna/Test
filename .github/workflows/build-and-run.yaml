@@ -4,12 +4,11 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'backend/**'  # Si attiva solo se ci sono modifiche nella cartella backend
+   
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,4 +26,4 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: 192.168.0.23:5000/orderhub-backend:${{ github.sha }}
+          tags: 192.168.0.23:5000/orderhub-backend:v1.0.1
