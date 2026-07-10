@@ -16,8 +16,8 @@ jobs:
   build:
     strategy:
       matrix:
-        project:   # seguendo questo schema project.name, possiamo aggiungere
-          - name: orderhub #tutti i progetti che vogliamo
+        project:
+          - name: orderhub
             context: orderhub/docker/backend
             dockerfile: orderhub/docker/backend/back
             image: 192.168.0.23:5000/orderhub-backend
@@ -28,13 +28,11 @@ jobs:
             image: 192.168.0.23:5000/shopsync-backend
             values: shopsync/values.yaml
 
-# la logca della matrice sostituisce ogni volta cio' che e' stato modificato
-# nei progetti
-
     runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -48,13 +46,7 @@ jobs:
           sed -i "s|tag:.*|tag: ${{ github.sha }}|" ${{ matrix.project.values }}
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add orderhub/values.yaml
-          git commit -m "Update backend image tag to ${{ github.sha }}"
-          for i in 1 2 3 4 5; do
-            git fetch origin main
-            git reset --hard origin/main
-            git stash pop 2>/dev/null || true
-            git add ${{ matrix.project.values }}
-          git commit -m "Update ${{ matrix.project.name }} backend tag to ${{ github.sha }}" || true            git push origin main && break
-            sleep 3
-          done
+          git add ${{ matrix.project.values }}
+          git commit -m "Update ${{ matrix.project.name }} backend tag to ${{ github.sha }}" || true
+          git pull --rebase origin main
+          git push origin main
