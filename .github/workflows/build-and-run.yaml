@@ -23,7 +23,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./backend
-          file: ./backend/Dockerfile
+          context: orderhub/docker/backend
+          file: orderhub/docker/backend/back
           push: true
-          tags: 192.168.0.23:5000/orderhub-backend:v1.0.1
+          tags: 192.168.0.23:5000/orderhub-backend:v1.0.2
