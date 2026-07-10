@@ -1,0 +1,30 @@
+name: Build and Push Backend Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'  # Si attiva solo se ci sono modifiche nella cartella backend
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to private registry
+        uses: docker/login-action@v3
+        with:
+          registry: 192.168.0.23:5000
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: 192.168.0.23:5000/orderhub-backend:${{ github.sha }}
