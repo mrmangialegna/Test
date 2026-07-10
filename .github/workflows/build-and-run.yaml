@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'orderhub/docker/backend/**'
-      
+
 permissions:
   contents: write
 
@@ -32,4 +32,5 @@ jobs:
           git config user.email "actions@github.com"
           git add orderhub/values.yaml
           git commit -m "Update backend image tag to ${{ github.sha }}"
+          git pull --rebase origin main
           git push
