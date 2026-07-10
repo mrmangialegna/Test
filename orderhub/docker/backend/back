@@ -3,3 +3,4 @@ COPY ./default.conf /etc/nginx/conf.d/default.conf
 RUN apk add --no-cache bash
 RUN adduser -D test
 USER test
+# trigger test
