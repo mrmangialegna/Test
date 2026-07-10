@@ -6,6 +6,9 @@ on:
       - main
     paths:
       - 'orderhub/docker/backend/**'
+      
+permissions:
+  contents: write
 
 jobs:
   build:
