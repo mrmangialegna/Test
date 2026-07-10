@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-   
+    paths:
+      - 'orderhub/docker/backend/**'
 
 jobs:
   build:
@@ -13,17 +14,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-    #  - name: Log in to private registry
-    #   uses: docker/login-action@v3
-    #   with:
-    #     registry: 192.168.0.23:5000
-    #     username: ${{ secrets.REGISTRY_USERNAME }}
-    #     password: ${{ secrets.REGISTRY_PASSWORD }}
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: orderhub/docker/backend
           file: orderhub/docker/backend/back
           push: true
-          tags: 192.168.0.23:5000/orderhub-backend:v1.0.2
+          tags: 192.168.0.23:5000/orderhub-backend:${{ github.sha }}
+
+      - name: Update values.yaml with new tag
+        run: |
+          sed -i "s|tag:.*|tag: ${{ github.sha }}|" orderhub/values.yaml
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add orderhub/values.yaml
+          git commit -m "Update backend image tag to ${{ github.sha }}"
+          git push
