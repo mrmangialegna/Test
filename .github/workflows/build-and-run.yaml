@@ -47,12 +47,11 @@ jobs:
           sed -i "s|tag:.*|tag: ${{ github.sha }}|" ${{ matrix.project.values }}
           git config user.name "github-actions"
           git config user.email "actions@github.com"
+          git add ${{ matrix.project.values }}
+          git commit -m "Update ${{ matrix.project.name }} backend tag to ${{ github.sha }}"
           for i in 1 2 3 4 5; do
-            git add ${{ matrix.project.values }}
-            git commit -m "Update ${{ matrix.project.name }} backend tag to ${{ github.sha }}" && break
+            git push origin main && break
             git fetch origin main
-            git reset --hard origin/main
-            sed -i "s|tag:.*|tag: ${{ github.sha }}|" ${{ matrix.project.values }}
+            git rebase origin/main
             sleep 3
           done
-          git push origin main
