@@ -95,7 +95,9 @@ servicebackend:
 deploymentaggregator:
   name: logstream-aggregator
   replicas: 2
-  image: logstream-aggregator:latest
+  image:
+    repository: 192.168.0.23:5000/logstream-aggregator
+    tag: latest
   port: "servicebackend.port"
   env:
     host: "servicedb.name"
