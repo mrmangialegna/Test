@@ -22,11 +22,6 @@ jobs:
             dockerfile: orderhub/docker/backend/back
             image: 192.168.0.23:5000/orderhub-backend
             values: orderhub/values.yaml
-          - name: shopsync
-            context: shopsync/docker/backend
-            dockerfile: shopsync/docker/backend/back
-            image: 192.168.0.23:5000/shopsync-backend
-            values: shopsync/values.yaml
           - name: logstream
             context: logstream/docker/backend
             dockerfile: logstream/docker/backend/back
