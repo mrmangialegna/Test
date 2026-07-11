@@ -97,7 +97,7 @@ deploymentaggregator:
   replicas: 2
   image:
     repository: 192.168.0.23:5000/logstream-aggregator
-    tag: latest
+    tag: 5c7d5c46872014e0de07f706e6982d678c61909f
   port: "servicebackend.port"
   env:
     host: "servicedb.name"
