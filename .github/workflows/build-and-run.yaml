@@ -47,7 +47,7 @@ jobs:
           sed -i "s|tag:.*|tag: ${{ github.sha }}|" ${{ matrix.project.values }}
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add orderhub/values.yaml
+          git add ${{ matrix.project.values }}
           git commit -m "Update backend image tag to ${{ github.sha }}"
           for i in 1 2 3 4 5; do
             git fetch origin main
