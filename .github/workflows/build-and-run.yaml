@@ -24,7 +24,7 @@ jobs:
             values: orderhub/values.yaml
           - name: logstream
             context: logstream/docker/backend
-            dockerfile: logstream/docker/backend/back
+            dockerfile: logstream/docker/backend/backend
             image: 192.168.0.23:5000/aggregator
             values: logstream/values.yaml
 # la logica della matrice sostituisce ogni volta cio' che e' stato modificato
