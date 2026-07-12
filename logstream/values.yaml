@@ -239,10 +239,5 @@ roleop:
 #operatorRoleBinding
 operatorRoleBinding:
   name: operatorRoleBinding
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name2: "roleop.name"
-  namesa: "serviceaccountop.name"
-  namespace: "namespace.name"
   
   

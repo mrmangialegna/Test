@@ -10,7 +10,7 @@ rules:
 
 ---
 
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: {{ .Values.serviceaccount.name }}
@@ -34,9 +34,8 @@ subjects:
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
-metadata: 
+metadata:
   name: {{ .Values.roleop.name }}
-  namespace: {{ .Values.namespace.name }}
 rules:
 {{- range .Values.roleop.rules }}
 - apiGroups:
@@ -48,11 +47,11 @@ rules:
 {{- end}}
 
 ---
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ .Values.serviceaccountop.name}}
-  namespace: {{ .Values.namespace.name}}
+  name: {{ .Values.serviceaccountop.name }}
+  namespace: {{ .Values.namespace.name }}
   
 ---
 
@@ -60,12 +59,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: {{ .Values.operatorRoleBinding.name }}
-  namespace: {{ .Values.namespace.name }}
 roleRef:
-  apiGroup: {{ .Values.operatorRoleBinding.apiGroup }}
-  kind: {{ .Values.operatorRoleBinding.kind }}
-  name: {{ .Values.operatorRoleBinding.name2 }}
-subject:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Values.roleop.name }}
+subjects:
 - kind: ServiceAccount
-  name: {{ .Values.operatorRoleBinding.namesa }}
-  namespace: {{ .Values.namespace.name}}
+  name: {{ .Values.serviceaccountop.name }}
+  namespace: {{ .Values.namespace.name }}

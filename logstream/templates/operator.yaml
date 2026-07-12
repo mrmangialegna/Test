@@ -13,7 +13,7 @@ spec:
       labels:
         app: {{ .Values.operator.name }}
     spec:
-      serviceAccountName: {{ .Values.serviceaccountop }}
+      serviceAccountName: {{ .Values.serviceaccountop.name }}
       containers:
       - name: {{ .Values.operator.name }}
         image: {{ .Values.operator.image }}
