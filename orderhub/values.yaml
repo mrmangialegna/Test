@@ -12,7 +12,7 @@ frontend:
   replicas: 2
   image:
     repository: 192.168.0.23:5000/orderhub-frontend
-    tag: 8eeb358ad2bc3a9bd4242ae6ae570f1c407b28dc
+    tag: c53c4cdf64a606ae6bd857e24244673876f5d96c
     pullPolicy: IfNotPresent
   resources:
     requests:
@@ -36,7 +36,7 @@ backend:
   replicas: 3
   image:
     repository: 192.168.0.23:5000/orderhub-backend
-    tag: 8eeb358ad2bc3a9bd4242ae6ae570f1c407b28dc
+    tag: c53c4cdf64a606ae6bd857e24244673876f5d96c
     pullPolicy: IfNotPresent
   resources:
     requests:
@@ -65,7 +65,7 @@ database:
   replicas: 1
   image:
     repository: postgres
-    tag: 8eeb358ad2bc3a9bd4242ae6ae570f1c407b28dc
+    tag: c53c4cdf64a606ae6bd857e24244673876f5d96c
     pullPolicy: IfNotPresent
   initContainer:
     image: busybox
