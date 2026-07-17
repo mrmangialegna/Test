@@ -1,0 +1,38 @@
+{{- if .Values.promtail.enabled }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Values.promtail.name }}
+  namespace: {{ include "orderhub.namespace" . }}
+  labels:
+    {{- include "orderhub.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.promtail.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.promtail.name }}
+    spec:
+      serviceAccountName: {{ .Values.promtail.name }}
+      containers:
+      - name: {{ .Values.promtail.name }}
+        image: "{{ .Values.promtail.image.repository }}:{{ .Values.promtail.image.tag }}"
+        imagePullPolicy: {{ .Values.promtail.image.pullPolicy }}
+        args:
+        - -config.file=/etc/promtail/promtail-config.yaml
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/promtail
+        - name: logs
+          mountPath: /var/log/pods
+          readOnly: true
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ .Values.promtailconfig.name }}
+      - name: logs
+        hostPath:
+          path: /var/log/pods
+{{- end }}

@@ -1,27 +1,29 @@
+{{- if .Values.backend.canary.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: orderhub-backend
+  name: orderhub-backend-v2
   namespace: {{ include "orderhub.namespace" . }}
   labels:
     {{- include "orderhub.labels" . | nindent 4 }}
     app: orderhub-backend
+    version: {{ .Values.destrule.subsetname2 }}
 spec:
-  replicas: {{ .Values.backend.replicas }}
+  replicas: {{ .Values.backend.canary.replicas }}
   selector:
     matchLabels:
       app: orderhub-backend
-      version: {{ .Values.destrule.subsetname1 }}
+      version: {{ .Values.destrule.subsetname2 }}
   template:
     metadata:
       labels:
         app: orderhub-backend
-        version: {{ .Values.destrule.subsetname1 }}
+        version: {{ .Values.destrule.subsetname2 }}
         {{- include "orderhub.selectorLabels" . | nindent 8 }}
     spec:
       containers:
       - name: orderhub-backend
-        image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+        image: "{{ .Values.backend.canary.image.repository | default .Values.backend.image.repository }}:{{ .Values.backend.canary.image.tag | default .Values.backend.image.tag }}"
         imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
         resources:
           {{- toYaml .Values.backend.resources | nindent 10 }}
@@ -70,3 +72,4 @@ spec:
             secretKeyRef:
               name: orderhub-secret
               key: db-password
+{{- end }}

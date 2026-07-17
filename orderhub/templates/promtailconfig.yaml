@@ -1,0 +1,42 @@
+{{- if .Values.promtail.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.promtailconfig.name }}
+  namespace: {{ include "orderhub.namespace" . }}
+  labels:
+    {{- include "orderhub.labels" . | nindent 4 }}
+data:
+  promtail-config.yaml: |
+    server:
+      http_listen_port: 9080
+
+    clients:
+      - url: {{ .Values.promtail.lokiUrl | quote }}
+
+    scrape_configs:
+      - job_name: orderhub-pods
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - {{ include "orderhub.namespace" . }}
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+          - source_labels: [__meta_kubernetes_container_name]
+            target_label: container
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            target_label: app
+        pipeline_stages:
+          - match:
+              selector: '{app=~"orderhub-.*"}'
+              stages:
+                - docker: {}
+                - regex:
+                    expression: '.*(?P<level>ERROR|WARN|INFO|DEBUG).*'
+                - labels:
+                    level: level
+{{- end }}

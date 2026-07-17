@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-training
+data:
+  host: "redis-svc"
+  port: "6379"

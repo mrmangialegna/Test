@@ -17,6 +17,7 @@ spec:
         app: orderhub-frontend
         {{- include "orderhub.selectorLabels" . | nindent 8 }}
     spec:
+      serviceAccountName: {{ .Values.frontend.serviceAccount.name }}
       containers:
       - name: orderhub-frontend
         image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"

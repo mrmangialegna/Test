@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ .Values.destrule.name }}
+  namespace: {{ include "orderhub.namespace" . }}
+spec:
+  host: orderhub-backend-svc
+  subsets:
+  - name: {{ .Values.destrule.subsetname1 }}
+    labels:
+      version: {{ .Values.destrule.subsetname1 }}
+  - name: {{ .Values.destrule.subsetname2 }}
+    labels:
+      version: {{ .Values.destrule.subsetname2 }}
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: {{ .Values.destrule.tcpmax }}
+      http:
+        maxPendingRequests: {{ .Values.destrule.httpmax }}
+    retries:
+      attempts: {{ .Values.destrule.attempts }}

@@ -11,5 +11,6 @@ spec:
   selector:
     app: orderhub-frontend
   ports:
-  - port: {{ .Values.frontend.service.port }}
+  - name: http
+    port: {{ .Values.frontend.service.port }}
     targetPort: {{ .Values.frontend.service.targetPort }}

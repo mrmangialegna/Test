@@ -1,0 +1,33 @@
+{{- if .Values.servicemonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: orderhub-backend-monitor
+  namespace: {{ include "orderhub.namespace" . }}
+  labels:
+    {{- include "orderhub.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: orderhub-backend
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: {{ .Values.servicemonitor.interval }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: orderhub-frontend-monitor
+  namespace: {{ include "orderhub.namespace" . }}
+  labels:
+    {{- include "orderhub.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: orderhub-frontend
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: {{ .Values.servicemonitor.interval }}
+{{- end }}

@@ -5,4 +5,7 @@ metadata:
   name: {{ include "orderhub.namespace" . }}
   labels:
     {{- include "orderhub.labels" . | nindent 4 }}
+    {{- with .Values.namespace.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 {{- end }}

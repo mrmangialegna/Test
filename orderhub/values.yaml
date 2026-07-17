@@ -7,8 +7,13 @@ fullnameOverride: ""
 namespace:
   create: true
   name: orderhub-staging
+  labels:
+    istio.io/rev: default
 
 frontend:
+  serviceAccount:
+    create: true
+    name: orderhub-frontend
   replicas: 2
   image:
     repository: 192.168.0.23:5000/orderhub-frontend
@@ -34,6 +39,10 @@ frontend:
 
 backend:
   replicas: 3
+  canary:
+    enabled: true
+    replicas: 1
+    image: {}
   image:
     repository: 192.168.0.23:5000/orderhub-backend
     tag: c53c4cdf64a606ae6bd857e24244673876f5d96c
@@ -143,3 +152,40 @@ storage:
     enabled: true
     name: pgdata
     size: 1Gi
+
+peerauth:
+  name: default
+  mode: PERMISSIVE
+
+destrule:
+  name: orderhub-backend-dr
+  subsetname1: v1
+  subsetname2: v2
+  tcpmax: 50
+  httpmax: 30
+  attempts: 3
+
+virtualservice:
+  name: orderhub-backend-vs
+  weight1: 90
+  weight2: 10
+
+authpolicy:
+  name: backend-auth
+  action: "ALLOW"
+
+promtail:
+  enabled: true
+  name: promtail
+  image:
+    repository: grafana/promtail
+    tag: "3.0.0"
+    pullPolicy: IfNotPresent
+  lokiUrl: http://loki:3100/loki/api/v1/push
+
+promtailconfig:
+  name: promtail-config
+
+servicemonitor:
+  enabled: true
+  interval: 15s
