@@ -25,7 +25,12 @@ jobs:
             values: orderhub/values.yaml
           - name: orderhub
             context: orderhub/docker/frontend
-            dockerfile: orderhub/docker/frontend/back
+            dockerfile: orderhub/docker/frontend/front
+            image: 192.168.0.23:5000/orderhub-frontend
+            values: orderhub/values.yaml
+          - name: orderhub
+            context: orderhub/docker/db
+            dockerfile: orderhub/docker/db/db
             image: 192.168.0.23:5000/orderhub-frontend
             values: orderhub/values.yaml
 
