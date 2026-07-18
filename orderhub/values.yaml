@@ -189,3 +189,7 @@ promtailconfig:
 servicemonitor:
   enabled: true
   interval: 15s
+
+podAnnotations:
+  sidecar.istio.io/proxyCPULimit: "250m"
+  sidecar.istio.io/proxyMemoryLimit: "128Mi"
