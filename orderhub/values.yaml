@@ -17,7 +17,7 @@ frontend:
   replicas: 1
   image:
     repository: 192.168.0.23:5000/orderhub-frontend
-    tag: 3faf23752cb5bb0828ad62ecc470ad0cbc65e706
+    tag: b52f23b06d3abf7e509ed62428fd22efc7eb34fe
     pullPolicy: IfNotPresent
   resources:
     requests:
@@ -45,7 +45,7 @@ backend:
     image: {}
   image:
     repository: 192.168.0.23:5000/orderhub-backend
-    tag: 3faf23752cb5bb0828ad62ecc470ad0cbc65e706
+    tag: b52f23b06d3abf7e509ed62428fd22efc7eb34fe
     pullPolicy: IfNotPresent
   resources:
     requests:
@@ -74,7 +74,7 @@ database:
   replicas: 1
   image:
     repository: postgres
-    tag: 3faf23752cb5bb0828ad62ecc470ad0cbc65e706
+    tag: b52f23b06d3abf7e509ed62428fd22efc7eb34fe
     pullPolicy: IfNotPresent
   initContainer:
     image: busybox
@@ -179,7 +179,7 @@ promtail:
   name: promtail
   image:
     repository: grafana/promtail
-    tag: 3faf23752cb5bb0828ad62ecc470ad0cbc65e706
+    tag: b52f23b06d3abf7e509ed62428fd22efc7eb34fe
     pullPolicy: IfNotPresent
   lokiUrl: http://loki:3100/loki/api/v1/push
 
