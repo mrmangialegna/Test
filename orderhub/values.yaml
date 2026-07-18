@@ -179,7 +179,7 @@ promtail:
   name: promtail
   image:
     repository: grafana/promtail
-    tag: 4bd851a6afb422e0956f01b083ef288188e67309
+    tag: 2.9.0
     pullPolicy: IfNotPresent
   lokiUrl: http://loki:3100/loki/api/v1/push
 
