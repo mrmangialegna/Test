@@ -128,7 +128,7 @@ limitRange:
       cpu: 50m
     max:
       memory: 1Gi
-      cpu: "1"
+      cpu: "2"
 
 resourceQuota:
   enabled: true
