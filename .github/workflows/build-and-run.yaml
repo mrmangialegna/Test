@@ -28,11 +28,7 @@ jobs:
             dockerfile: orderhub/docker/frontend/front
             image: 192.168.0.23:5000/orderhub-frontend
             values: orderhub/values.yaml
-          - name: orderhub
-            context: orderhub/docker/db
-            dockerfile: orderhub/docker/db/db
-            image: 192.168.0.23:5000/orderhub-frontend
-            values: orderhub/values.yaml
+          
 
     runs-on: self-hosted
     steps:
@@ -49,7 +45,8 @@ jobs:
 
       - name: Update values.yaml with new tag
         run: |
-          sed -i "s|tag:.*|tag: ${{ github.sha }}|" ${{ matrix.project.values }}
+          sed -i '/^backend:/,/^[a-z]/{s|tag:.*|tag: ${{ github.sha }}|}' ${{ matrix.project.values }}
+          sed -i '/^frontend:/,/^[a-z]/{s|tag:.*|tag: ${{ github.sha }}|}' ${{ matrix.project.values }}
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add ${{ matrix.project.values }}

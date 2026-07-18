@@ -74,7 +74,11 @@ database:
   replicas: 1
   image:
     repository: postgres
+<<<<<<< HEAD
     tag: 5f3208d063a3d5870c28cf4547d8cfe42a496e3f
+=======
+    tag: "15"
+>>>>>>> 33465d0 (update replicaset, requota, istiolimit)
     pullPolicy: IfNotPresent
   initContainer:
     image: busybox
