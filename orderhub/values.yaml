@@ -136,7 +136,7 @@ resourceQuota:
   hard:
     requests.cpu: "2"
     requests.memory: 8Gi
-    limits.cpu: "14"
+    limits.cpu: "20"
     limits.memory: 16Gi
 
 storage:
