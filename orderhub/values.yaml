@@ -14,7 +14,7 @@ frontend:
   serviceAccount:
     create: true
     name: orderhub-frontend
-  replicas: 2
+  replicas: 1
   image:
     repository: 192.168.0.23:5000/orderhub-frontend
     tag: 3faf23752cb5bb0828ad62ecc470ad0cbc65e706
@@ -38,7 +38,7 @@ frontend:
     targetPort: 80
 
 backend:
-  replicas: 3
+  replicas: 1
   canary:
     enabled: true
     replicas: 1
@@ -128,7 +128,7 @@ limitRange:
       cpu: 50m
     max:
       memory: 1Gi
-      cpu: "2"
+      cpu: "1"
 
 resourceQuota:
   enabled: true
