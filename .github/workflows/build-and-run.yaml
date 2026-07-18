@@ -45,6 +45,7 @@ jobs:
 
       - name: Update values.yaml with new tag
         run: |
+          sed -i '/^database:/,/^[a-z]/{s|tag:.*|tag: "15"|}' orderhub/values.yaml
           sed -i '/^backend:/,/^[a-z]/{s|tag:.*|tag: ${{ github.sha }}|}' ${{ matrix.project.values }}
           sed -i '/^frontend:/,/^[a-z]/{s|tag:.*|tag: ${{ github.sha }}|}' ${{ matrix.project.values }}
           git config user.name "github-actions"
