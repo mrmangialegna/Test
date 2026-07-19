@@ -6,11 +6,11 @@ metadata:
 spec:
   selector:
     matchLabels:
-      istio: pilot        # per i componenti del piano di controllo, se vuoi
+      istio: pilot        
   namespaceSelector:
     any: true
   endpoints:
-  - port: http-monitoring   # nome porta sul Pod (di default è "http-monitoring" per istiod)
+  - port: http-monitoring   
     interval: 15s
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -21,7 +21,7 @@ metadata:
 spec:
   selector:
     matchExpressions:
-    - key: security.istio.io/tlsMode   # label presente sui Pod iniettati
+    - key: security.istio.io/tlsMode   
       operator: Exists
   namespaceSelector:
     any: true
