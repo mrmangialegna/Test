@@ -2,7 +2,9 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: envoy-stats-monitor
-  namespace: monitoring
+  namespace: orderhub-staging
+  labels:
+    release: prometheus
 spec:
   selector:
     matchExpressions:
