@@ -1,33 +1,31 @@
-{{- if .Values.servicemonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: orderhub-backend-monitor
-  namespace: {{ include "orderhub.namespace" . }}
-  labels:
-    {{- include "orderhub.labels" . | nindent 4 }}
+  name: istio-component-monitor
+  namespace: monitoring
 spec:
   selector:
     matchLabels:
-      app: orderhub-backend
+      istio: pilot        # per i componenti del piano di controllo, se vuoi
+  namespaceSelector:
+    any: true
   endpoints:
-  - port: http
-    path: /metrics
-    interval: {{ .Values.servicemonitor.interval }}
+  - port: http-monitoring   # nome porta sul Pod (di default è "http-monitoring" per istiod)
+    interval: 15s
 ---
 apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
+kind: PodMonitor
 metadata:
-  name: orderhub-frontend-monitor
-  namespace: {{ include "orderhub.namespace" . }}
-  labels:
-    {{- include "orderhub.labels" . | nindent 4 }}
+  name: envoy-stats-monitor
+  namespace: monitoring
 spec:
   selector:
-    matchLabels:
-      app: orderhub-frontend
-  endpoints:
-  - port: http
-    path: /metrics
-    interval: {{ .Values.servicemonitor.interval }}
-{{- end }}
+    matchExpressions:
+    - key: security.istio.io/tlsMode   # label presente sui Pod iniettati
+      operator: Exists
+  namespaceSelector:
+    any: true
+  podMetricsEndpoints:
+  - port: http-envoy-prom
+    path: /stats/prometheus
+    interval: 15s
