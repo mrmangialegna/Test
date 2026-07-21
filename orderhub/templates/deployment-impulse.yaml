@@ -20,8 +20,8 @@ spec:
         - containerPort: {{ .Values.impulse.port }}
         resources:
           requests:
-            memory: {{ .Values.impulse.requests.memory }}
-            cpu: {{ .Values.impulse.requests.cpu }}
+            memory: {{ .Values.impulse.resources.requests.memory }}
+            cpu: {{ .Values.impulse.resources.requests.cpu }}
           limits:
-            memory: {{ .Values.impulse.limits.memory }}
-            cpu: {{ .Values.impulse.limits.cpu }}
+            memory: {{ .Values.impulse.resources.limits.memory }}
+            cpu: {{ .Values.impulse.resources.limits.cpu }}
