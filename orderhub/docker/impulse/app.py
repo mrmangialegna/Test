@@ -33,7 +33,7 @@ def get_disk_usage():
 def write_to_db(cpu, mem, disk):
     conn = psycopg2.connect(
         host='orderhub-db-svc',
-        dbname='orderhubdb',
+        dbname='orderhub',
         user='postgres',
         password='abracadabra'
     )
