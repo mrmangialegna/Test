@@ -31,7 +31,7 @@ frontend:
   replicas: 1
   image:
     repository: 192.168.0.23:5000/orderhub-frontend
-    tag: 36e150eef20ffc2d638f287f41c457c1e3584529
+    tag: 067d4fe5161109a082a03707bdf306092f94e6e1
     pullPolicy: IfNotPresent
   resources:
     requests:
@@ -59,7 +59,7 @@ backend:
     image: {}
   image:
     repository: 192.168.0.23:5000/orderhub-backend
-    tag: 36e150eef20ffc2d638f287f41c457c1e3584529
+    tag: 067d4fe5161109a082a03707bdf306092f94e6e1
     pullPolicy: IfNotPresent
   resources:
     requests:
