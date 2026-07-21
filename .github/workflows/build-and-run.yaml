@@ -29,7 +29,7 @@ jobs:
             image: 192.168.0.23:5000/orderhub-frontend
             values: orderhub/values.yaml
           - name: orderhub
-            context: orderhub/impulse/dockerfile
+            context: orderhub/docker/impulse
             dockerfile: orderhub/docker/impulse/dockerfile
             image: 192.168.0.23:5000/orderhub-impulse
             values: orderhub/values.yaml
