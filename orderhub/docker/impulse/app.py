@@ -6,9 +6,9 @@ import psycopg2
 from prometheus_client import start_http_server, Gauge, Counter
 
 # Metriche Prometheus
-CPU_USAGE = Gauge('node_cpu_usage_percent', 'CPU usage percent')
-MEM_USAGE = Gauge('node_mem_usage_percent', 'Memory usage percent')
-DISK_USAGE = Gauge('node_disk_usage_percent', 'Disk usage percent')
+CPU_USAGE = Gauge('node_cpu_usage_percent', 'CPU Usage percent')
+MEM_USAGE = Gauge('node_mem_usage_percent', 'Memory Usage percent')
+DISK_USAGE = Gauge('node_disk_usage_percent', 'Disk Usage percent')
 CHECK_COUNT = Counter('health_check_count', 'Number of health checks')
 
 def get_cpu_usage():
