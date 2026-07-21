@@ -16,6 +16,7 @@ spec:
       containers:
       - name: {{ .Values.impulse.name }}
         image: "{{ .Values.impulse.image.repository }}:{{ .Values.impulse.image.tag }}"
+        imagePullPolicy: Always
         ports:
         - containerPort: {{ .Values.impulse.port }}
         resources:
