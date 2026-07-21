@@ -10,6 +10,20 @@ namespace:
   labels:
     istio.io/rev: default
 
+impulse:
+  name: orderhub-impulse
+  port: 8080
+  image: 
+    repository: 192.168.0.20:5000/orderhub-impulse
+    tag:
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 100m
+    limits:
+      memory: 128Mi
+      cpu: 200m
+
 frontend:
   serviceAccount:
     create: true

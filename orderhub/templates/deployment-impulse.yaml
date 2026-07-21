@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.impulse.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.impulse.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.impulse.name }}
+    spec:
+      containers:
+      - name: {{ .Values.impulse.name }}
+        image: "{{ .Values.impulse.image.repository }}:{{ .Values.impulse.image.tag }}"
+        ports:
+        - containerPort: {{ .Values.impulse.port }}
+        resources:
+          requests:
+            memory: {{ .Values.impulse.request.memory }}
+            cpu: {{ .Values.impulse.request.cpu }}
+          limits:
+            memory: {{ .Values.impulse.limit.memory }}
+            cpu: {{ .Values.impulse.limit.cpu }}

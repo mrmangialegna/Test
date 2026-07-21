@@ -28,6 +28,11 @@ jobs:
             dockerfile: orderhub/docker/frontend/front
             image: 192.168.0.23:5000/orderhub-frontend
             values: orderhub/values.yaml
+          - name: orderhub
+            context: orderhub/impulse/dockerfile
+            dockerfile: orderhub/docker/impulse/dockerfile
+            image: 192.168.0.23:5000/orderhub-impulse
+            values: orderhub/values.yaml
           
 
     runs-on: self-hosted
