@@ -3,11 +3,13 @@ kind: ServiceMonitor
 metadata:
   name: orderhub-impulse-monitor
   namespace: orderhub-staging
+  labels:
+    app: orderhub-impulse
 spec:
   selector:
     matchLabels:
       app: orderhub-impulse
   endpoints:
-  - port: http
+  - port: metrics
     path: /metrics
     interval: 15s

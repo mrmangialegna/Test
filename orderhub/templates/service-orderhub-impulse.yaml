@@ -3,13 +3,17 @@ kind: Service
 metadata:
   name: impulse-service
   namespace: {{ .Values.namespace.name }}
+  labels:
+    app: orderhub-impulse
 spec:
   type: ClusterIP
   selector:
     app: orderhub-impulse
   ports:
-  - port: 8000
+  - name: http
+    port: 8000
     targetPort: 8000
-  - port: 5000
+  - name: metrics
+    port: 5000
     targetPort: 5000
 
