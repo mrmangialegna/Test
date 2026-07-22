@@ -28,20 +28,20 @@ spec:
         - name: DB_HOST
           valueFrom:
             configMapKeyRef:
-              name: {{ .Values.configmap.name }}
+              name: {{ .Values.configMap }}
               key: dbHost
         - name: DB_NAME
           valueFrom:
             configMapKeyRef:
-              name: {{ .Values.configmap.name }}
+              name: {{ .Values.configMap }}
               key: dbName
         - name: DB_USER
           valueFrom:
             configMapKeyRef:
-              name: {{ .Values.configmap.name }}
+              name: {{ .Values.configMap }}
               key: dbUser
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.secret.name }}
+              name: {{ .Values.secret }}
               key: dbPassword 
