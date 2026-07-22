@@ -3,8 +3,11 @@ kind: Deployment
 metadata:
   name: {{ .Values.impulse.name }}
   namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "orderhub.labels" . | nindent 4 }}
+    app: {{ .Values.impulse.name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.impulse.replicas }}
   selector:
     matchLabels:
       app: {{ .Values.impulse.name }}
@@ -16,13 +19,8 @@ spec:
       containers:
       - name: {{ .Values.impulse.name }}
         image: "{{ .Values.impulse.image.repository }}:{{ .Values.impulse.image.tag }}"
-        imagePullPolicy: Always
+        imagePullPolicy: {{ .Values.impulse.image.pullPolicy }}
         ports:
         - containerPort: {{ .Values.impulse.port }}
         resources:
-          requests:
-            memory: {{ .Values.impulse.resources.requests.memory }}
-            cpu: {{ .Values.impulse.resources.requests.cpu }}
-          limits:
-            memory: {{ .Values.impulse.resources.limits.memory }}
-            cpu: {{ .Values.impulse.resources.limits.cpu }}
+          {{- toYaml .Values.impulse.resources | nindent 10 }}

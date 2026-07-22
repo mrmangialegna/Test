@@ -1,15 +1,15 @@
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
-  name: {{ .Values.authpolicy.name }}
-  namespace: {{ include "orderhub.namespace" . }}
+  name: {{ .Values.authorizationPolicy.name }}
+  namespace: {{ .Values.namespace.name }}
 spec:
   selector:
     matchLabels:
-      app: orderhub-backend
-  action: {{ .Values.authpolicy.action }}
+      {{- toYaml .Values.authorizationPolicy.selector | nindent 6 }}
+  action: {{ .Values.authorizationPolicy.action }}
   rules:
   - from:
     - source:
         principals:
-        - cluster.local/ns/{{ include "orderhub.namespace" . }}/sa/{{ .Values.frontend.serviceAccount.name }}
+        - {{ .Values.authorizationPolicy.principal }}

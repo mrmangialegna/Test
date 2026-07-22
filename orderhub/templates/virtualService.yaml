@@ -1,18 +1,16 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: {{ .Values.virtualservice.name }}
-  namespace: {{ include "orderhub.namespace" . }}
+  name: {{ .Values.virtualService.name }}
+  namespace: {{ .Values.namespace.name }}
 spec:
   hosts:
-  - orderhub-backend-svc
+  - {{ .Values.virtualService.host }}
   http:
   - route:
+    {{- range .Values.virtualService.routes }}
     - destination:
-        host: orderhub-backend-svc
-        subset: {{ .Values.destrule.subsetname1 }}
-      weight: {{ .Values.virtualservice.weight1 }}
-    - destination:
-        host: orderhub-backend-svc
-        subset: {{ .Values.destrule.subsetname2 }}
-      weight: {{ .Values.virtualservice.weight2 }}
+        host: {{ $.Values.virtualService.host }}
+        subset: {{ .subset }}
+      weight: {{ .weight }}
+    {{- end }}

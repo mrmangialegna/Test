@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: orderhub-backend
-  namespace: {{ include "orderhub.namespace" . }}
+  name: {{ .Values.backend.name }}
+  namespace: {{ .Values.namespace.name }}
   labels:
     {{- include "orderhub.labels" . | nindent 4 }}
-    app: orderhub-backend
+    app: {{ .Values.backend.name }}
 spec:
   replicas: {{ .Values.backend.replicas }}
   selector:
     matchLabels:
-      app: orderhub-backend
-      version: {{ .Values.destrule.subsetname1 }}
+      app: {{ .Values.backend.name }}
+      version: {{ .Values.backend.version }}
   template:
     metadata:
       labels:
-        app: orderhub-backend
-        version: {{ .Values.destrule.subsetname1 }}
+        app: {{ .Values.backend.name }}
+        version: {{ .Values.backend.version }}
         {{- include "orderhub.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-      - name: orderhub-backend
+      - name: {{ .Values.backend.name }}
         image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
         imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
         resources:
@@ -43,30 +43,30 @@ spec:
         - name: DB_HOST
           valueFrom:
             configMapKeyRef:
-              name: orderhub-config
+              name: {{ .Values.backend.configMapName }}
               key: db-host
         - name: DB_PORT
           valueFrom:
             configMapKeyRef:
-              name: orderhub-config
+              name: {{ .Values.backend.configMapName }}
               key: db-port
         - name: DB_USER
           valueFrom:
             configMapKeyRef:
-              name: orderhub-config
+              name: {{ .Values.backend.configMapName }}
               key: db-user
         - name: DB_NAME
           valueFrom:
             configMapKeyRef:
-              name: orderhub-config
+              name: {{ .Values.backend.configMapName }}
               key: db-name
         - name: LOG_LEVEL
           valueFrom:
             configMapKeyRef:
-              name: orderhub-config
+              name: {{ .Values.backend.configMapName }}
               key: log-level
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: orderhub-secret
+              name: {{ .Values.backend.secretName }}
               key: db-password

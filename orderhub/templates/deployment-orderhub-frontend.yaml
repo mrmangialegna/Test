@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: orderhub-frontend
-  namespace: {{ include "orderhub.namespace" . }}
+  name: {{ .Values.frontend.name }}
+  namespace: {{ .Values.namespace.name }}
   labels:
     {{- include "orderhub.labels" . | nindent 4 }}
-    app: orderhub-frontend
+    app: {{ .Values.frontend.name }}
 spec:
   replicas: {{ .Values.frontend.replicas }}
   selector:
     matchLabels:
-      app: orderhub-frontend
+      app: {{ .Values.frontend.name }}
   template:
     metadata:
       labels:
-        app: orderhub-frontend
+        app: {{ .Values.frontend.name }}
         {{- include "orderhub.selectorLabels" . | nindent 8 }}
     spec:
-      serviceAccountName: {{ .Values.frontend.serviceAccount.name }}
+      serviceAccountName: {{ .Values.frontend.serviceAccountName }}
       containers:
-      - name: orderhub-frontend
+      - name: {{ .Values.frontend.name }}
         image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
         imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
         resources:

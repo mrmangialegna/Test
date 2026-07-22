@@ -1,16 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: orderhub-frontend-svc
-  namespace: {{ include "orderhub.namespace" . }}
+  name: {{ .Values.frontendService.name }}
+  namespace: {{ .Values.namespace.name }}
   labels:
     {{- include "orderhub.labels" . | nindent 4 }}
-    app: orderhub-frontend
+    app: {{ .Values.frontendService.selector }}
 spec:
-  type: {{ .Values.frontend.service.type }}
+  type: {{ .Values.frontendService.type }}
   selector:
-    app: orderhub-frontend
+    app: {{ .Values.frontendService.selector }}
   ports:
   - name: http
-    port: {{ .Values.frontend.service.port }}
-    targetPort: {{ .Values.frontend.service.targetPort }}
+    port: {{ .Values.frontendService.port }}
+    targetPort: {{ .Values.frontendService.targetPort }}

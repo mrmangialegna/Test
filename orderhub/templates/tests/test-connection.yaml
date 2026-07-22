@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: "{{ include "orderhub.fullname" . }}-test-connection"
-  namespace: {{ include "orderhub.namespace" . }}
+  namespace: {{ .Values.namespace.name }}
   labels:
     {{- include "orderhub.labels" . | nindent 4 }}
   annotations:
@@ -12,5 +12,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['orderhub-frontend-svc:{{ .Values.frontend.service.port }}']
+      args: ['{{ .Values.frontendService.name }}:{{ .Values.frontendService.port }}']
   restartPolicy: Never

@@ -1,15 +1,13 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: orderhub-impulse-monitor
-  namespace: orderhub-staging
+  name: {{ .Values.impulseServiceMonitor.name }}
+  namespace: {{ .Values.namespace.name }}
   labels:
-    app: orderhub-impulse
+    {{- toYaml .Values.impulseServiceMonitor.labels | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      app: orderhub-impulse
+      {{- toYaml .Values.impulseServiceMonitor.selector | nindent 6 }}
   endpoints:
-  - port: metrics
-    path: /metrics
-    interval: 15s
+  {{- toYaml .Values.impulseServiceMonitor.endpoints | nindent 2 }}

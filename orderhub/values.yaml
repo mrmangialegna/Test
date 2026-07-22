@@ -1,21 +1,21 @@
 # Default values for orderhub Helm chart.
 # Override with: helm install orderhub . -f my-values.yaml -n orderhub-staging --create-namespace
-
-nameOverride: ""
-fullnameOverride: ""
+# Ogni risorsa Kubernetes ha la propria sezione esplicita. Nessun flag enabled/create.
 
 namespace:
-  create: true
   name: orderhub-staging
   labels:
     istio.io/rev: default
 
+# --- Impulse ---
 impulse:
   name: orderhub-impulse
-  port: 8080
-  image: 
+  replicas: 1
+  image:
     repository: 192.168.0.23:5000/orderhub-impulse
     tag: latest
+    pullPolicy: Always
+  port: 8000
   resources:
     requests:
       memory: 64Mi
@@ -24,10 +24,29 @@ impulse:
       memory: 128Mi
       cpu: 200m
 
+impulseService:
+  name: impulse-service
+  type: ClusterIP
+  selector: orderhub-impulse
+  ports:
+    - name: metrics
+      port: 8000
+      targetPort: 8000
+
+impulseServiceMonitor:
+  name: orderhub-impulse-monitor
+  labels:
+    app: orderhub-impulse
+  selector:
+    app: orderhub-impulse
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+
+# --- Frontend ---
 frontend:
-  serviceAccount:
-    create: true
-    name: orderhub-frontend
+  name: orderhub-frontend
   replicas: 1
   image:
     repository: 192.168.0.23:5000/orderhub-frontend
@@ -46,17 +65,23 @@ frontend:
     port: 80
     initialDelaySeconds: 5
     periodSeconds: 5
-  service:
-    type: ClusterIP
-    port: 80
-    targetPort: 80
+  serviceAccountName: orderhub-frontend
 
+frontendServiceAccount:
+  name: orderhub-frontend
+
+frontendService:
+  name: orderhub-frontend-svc
+  type: ClusterIP
+  selector: orderhub-frontend
+  port: 80
+  targetPort: 80
+
+# --- Backend ---
 backend:
+  name: orderhub-backend
   replicas: 1
-  canary:
-    enabled: true
-    replicas: 1
-    image: {}
+  version: v1
   image:
     repository: 192.168.0.23:5000/orderhub-backend
     tag: 067d4fe5161109a082a03707bdf306092f94e6e1
@@ -79,12 +104,19 @@ backend:
     port: 80
     initialDelaySeconds: 10
     periodSeconds: 10
-  service:
-    type: ClusterIP
-    port: 80
-    targetPort: 80
+  configMapName: orderhub-config
+  secretName: orderhub-secret
 
+backendService:
+  name: orderhub-backend-svc
+  type: ClusterIP
+  selector: orderhub-backend
+  port: 80
+  targetPort: 80
+
+# --- Database ---
 database:
+  name: orderhub-db
   replicas: 1
   image:
     repository: postgres
@@ -93,10 +125,7 @@ database:
   initContainer:
     image: busybox
     pullPolicy: IfNotPresent
-  storage: 1Gi
-  storageClassName: ""
-  pvc:
-    name: pgdata
+  port: 5432
   resources:
     requests:
       cpu: 250m
@@ -104,10 +133,6 @@ database:
     limits:
       cpu: 250m
       memory: 256Mi
-  port: 5432
-  service:
-    port: 5432
-    targetPort: 5432
   probes:
     user: postgres
     liveness:
@@ -116,8 +141,20 @@ database:
     readiness:
       initialDelaySeconds: 10
       periodSeconds: 5
+  pvcClaimName: pgdata
+  secretName: orderhub-secret
+  configMapName: orderhub-config
+  serviceName: orderhub-db-svc
 
-config:
+databaseService:
+  name: orderhub-db-svc
+  selector: orderhub-db
+  port: 5432
+  targetPort: 5432
+
+# --- Config / Secret ---
+configMap:
+  name: orderhub-config
   dbHost: orderhub-db-svc
   dbPort: "5432"
   dbUser: postgres
@@ -125,10 +162,11 @@ config:
   logLevel: info
 
 secret:
+  name: orderhub-secret
   dbPassword: abracadabra
 
+# --- Quota / Limits ---
 limitRange:
-  enabled: true
   name: limrange
   container:
     defaultRequest:
@@ -145,7 +183,6 @@ limitRange:
       cpu: "2"
 
 resourceQuota:
-  enabled: true
   name: resquota
   hard:
     requests.cpu: "2"
@@ -153,56 +190,104 @@ resourceQuota:
     limits.cpu: "20"
     limits.memory: 16Gi
 
-storage:
-  enabled: true
-  className: proxmox-local
-  default: true
-  pv:
-    enabled: true
-    name: orderhub-db-pv
-    hostPath: /mnt/data/orderhub-db
-    size: 1Gi
-  pvc:
-    enabled: true
-    name: pgdata
-    size: 1Gi
+# --- Storage ---
+storageClass:
+  name: proxmox-local
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+  provisioner: kubernetes.io/no-provisioner
+  volumeBindingMode: WaitForFirstConsumer
+  reclaimPolicy: Retain
 
-peerauth:
+persistentVolume:
+  name: orderhub-db-pv
+  size: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  reclaimPolicy: Retain
+  storageClassName: proxmox-local
+  hostPath: /mnt/data/orderhub-db
+  hostPathType: DirectoryOrCreate
+  labels:
+    app: orderhub-db
+
+persistentVolumeClaim:
+  name: pgdata
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: proxmox-local
+  size: 1Gi
+  labels:
+    app: orderhub-db
+
+# --- Istio ---
+peerAuthentication:
   name: default
   mode: PERMISSIVE
 
-destrule:
+destinationRule:
   name: orderhub-backend-dr
-  subsetname1: v1
-  subsetname2: v2
-  tcpmax: 50
-  httpmax: 30
-  attempts: 3
+  host: orderhub-backend-svc
+  subsets:
+    - name: v1
+      version: v1
+    - name: v2
+      version: v2
+  tcpMaxConnections: 50
+  httpMaxPendingRequests: 30
+  retryAttempts: 3
 
-virtualservice:
+virtualService:
   name: orderhub-backend-vs
-  weight1: 90
-  weight2: 10
+  host: orderhub-backend-svc
+  routes:
+    - subset: v1
+      weight: 90
+    - subset: v2
+      weight: 10
 
-authpolicy:
+authorizationPolicy:
   name: backend-auth
-  action: "ALLOW"
+  action: ALLOW
+  selector:
+    app: orderhub-backend
+  principal: cluster.local/ns/orderhub-staging/sa/orderhub-frontend
 
+# --- Promtail ---
 promtail:
-  enabled: true
   name: promtail
   image:
     repository: grafana/promtail
     tag: 2.9.0
     pullPolicy: IfNotPresent
-  lokiUrl: http://loki:3100/loki/api/v1/push
+  configMapName: promtail-config
+  excludeNodes:
+    - registry
 
-promtailconfig:
+promtailServiceAccount:
+  name: promtail
+
+promtailRole:
+  name: promtail
+
+promtailRoleBinding:
+  name: promtail
+
+promtailConfig:
   name: promtail-config
+  httpListenPort: 9080
+  lokiUrl: http://loki:3100/loki/api/v1/push
+  scrapeNamespace: orderhub-staging
+  appSelector: 'orderhub-.*'
 
-servicemonitor:
-  enabled: true
+# --- Monitoring ---
+podMonitor:
+  name: envoy-stats-monitor
+  labels:
+    release: prometheus
   interval: 15s
+  port: http-envoy-prom
+  path: /stats/prometheus
 
 podAnnotations:
   sidecar.istio.io/proxyCPULimit: "250m"

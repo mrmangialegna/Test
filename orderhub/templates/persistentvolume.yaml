@@ -1,19 +1,17 @@
-{{- if and .Values.storage.enabled .Values.storage.pv.enabled }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .Values.storage.pv.name }}
+  name: {{ .Values.persistentVolume.name }}
   labels:
     {{- include "orderhub.labels" . | nindent 4 }}
-    app: orderhub-db
+    {{- toYaml .Values.persistentVolume.labels | nindent 4 }}
 spec:
   capacity:
-    storage: {{ .Values.storage.pv.size }}
+    storage: {{ .Values.persistentVolume.size }}
   accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: {{ .Values.storage.className }}
+    {{- toYaml .Values.persistentVolume.accessModes | nindent 4 }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistentVolume.reclaimPolicy }}
+  storageClassName: {{ .Values.persistentVolume.storageClassName }}
   hostPath:
-    path: {{ .Values.storage.pv.hostPath }}
-    type: DirectoryOrCreate
-{{- end }}
+    path: {{ .Values.persistentVolume.hostPath }}
+    type: {{ .Values.persistentVolume.hostPathType }}

@@ -1,9 +1,8 @@
-{{- if .Values.promtail.enabled }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: {{ .Values.promtail.name }}
-  namespace: {{ include "orderhub.namespace" . }}
+  namespace: {{ .Values.namespace.name }}
   labels:
     {{- include "orderhub.labels" . | nindent 4 }}
 spec:
@@ -23,8 +22,8 @@ spec:
               - key: metadata.name
                 operator: NotIn
                 values:
-                - registry
-      serviceAccountName: {{ .Values.promtail.name }}
+                {{- toYaml .Values.promtail.excludeNodes | nindent 16 }}
+      serviceAccountName: {{ .Values.promtailServiceAccount.name }}
       containers:
       - name: {{ .Values.promtail.name }}
         image: "{{ .Values.promtail.image.repository }}:{{ .Values.promtail.image.tag }}"
@@ -40,8 +39,7 @@ spec:
       volumes:
       - name: config-volume
         configMap:
-          name: {{ .Values.promtailconfig.name }}
+          name: {{ .Values.promtail.configMapName }}
       - name: logs
         hostPath:
           path: /var/log/pods
-{{- end }}

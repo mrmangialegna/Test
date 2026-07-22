@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: orderhub-db
-  namespace: {{ include "orderhub.namespace" . }}
+  name: {{ .Values.database.name }}
+  namespace: {{ .Values.namespace.name }}
   labels:
     {{- include "orderhub.labels" . | nindent 4 }}
-    app: orderhub-db
+    app: {{ .Values.database.name }}
 spec:
   selector:
     matchLabels:
-      app: orderhub-db
-  serviceName: orderhub-db-svc
+      app: {{ .Values.database.name }}
+  serviceName: {{ .Values.database.serviceName }}
   replicas: {{ .Values.database.replicas }}
   template:
     metadata:
       labels:
-        app: orderhub-db
+        app: {{ .Values.database.name }}
         {{- include "orderhub.selectorLabels" . | nindent 8 }}
     spec:
       initContainers:
@@ -29,7 +29,7 @@ spec:
         - name: init-log
           mountPath: /init-log
       containers:
-      - name: orderhub-db
+      - name: {{ .Values.database.name }}
         image: "{{ .Values.database.image.repository }}:{{ .Values.database.image.tag }}"
         imagePullPolicy: {{ .Values.database.image.pullPolicy }}
         ports:
@@ -60,16 +60,16 @@ spec:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: orderhub-secret
+              name: {{ .Values.database.secretName }}
               key: db-password
         - name: POSTGRES_DB
           valueFrom:
             configMapKeyRef:
-              name: orderhub-config
+              name: {{ .Values.database.configMapName }}
               key: db-name
       volumes:
       - name: init-log
         emptyDir: {}
       - name: pgdata
         persistentVolumeClaim:
-          claimName: {{ .Values.database.pvc.name }}
+          claimName: {{ .Values.database.pvcClaimName }}
