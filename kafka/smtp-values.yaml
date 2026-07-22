@@ -1,0 +1,9 @@
+grafana:
+  grafana.ini:
+    smtp:
+      enabled: true
+      host: smtp.gmail.com:587
+      user: emanuelegaudioso@gmail.com
+      password: 56324935
+      from_address: tuaemail@gmail.com
+      from_name: Grafana
