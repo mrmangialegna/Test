@@ -13,7 +13,7 @@ impulse:
   replicas: 1
   image:
     repository: 192.168.0.23:5000/orderhub-impulse
-    tag: 23bcefb249784759f5f09562e1449d8dff634039
+    tag: dad464800508e290fe0c2b450d77fbd8284491ea
     pullPolicy: Always
   port: 8000
   resources:
