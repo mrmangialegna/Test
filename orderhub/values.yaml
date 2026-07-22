@@ -50,7 +50,7 @@ frontend:
   replicas: 1
   image:
     repository: 192.168.0.23:5000/orderhub-frontend
-    tag: b4152012ba60987b73467004f91a227df64584f5
+    tag: 5996077a844ff22f894446edc6819b905317842d
     pullPolicy: IfNotPresent
   resources:
     requests:
