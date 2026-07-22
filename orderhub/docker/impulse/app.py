@@ -32,10 +32,10 @@ def get_disk_usage():
 
 def write_to_db(cpu, mem, disk):
     conn = psycopg2.connect(
-        host='orderhub-db-svc',
-        dbname='orderhub',
-        user='postgres',
-        password='abracadabra'
+         host=os.environ['DB_HOST'],
+        dbname=os.environ['DB_NAME'],
+        user=os.environ['DB_USER'],
+        password=os.environ['DB_PASSWORD']
     )
     cur = conn.cursor()
     cur.execute('CREATE TABLE IF NOT EXISTS cpu_metrics (ts TIMESTAMPTZ DEFAULT NOW(), value FLOAT)')
