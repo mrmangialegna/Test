@@ -15,7 +15,7 @@ impulse:
   port: 8080
   image: 
     repository: 192.168.0.23:5000/orderhub-impulse
-    tag: ${{ github.sha }}
+    tag: latest
   resources:
     requests:
       memory: 64Mi
