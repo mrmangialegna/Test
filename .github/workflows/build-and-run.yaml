@@ -18,17 +18,17 @@ jobs:
       max-parallel: 1
       matrix:
         project:
-          - name: orderhub
+          - name: orderhub-backend
             context: orderhub/docker/backend
             dockerfile: orderhub/docker/backend/back
             image: 192.168.0.23:5000/orderhub-backend
             values: orderhub/values.yaml
-          - name: orderhub
+          - name: orderhub-frontend
             context: orderhub/docker/frontend
             dockerfile: orderhub/docker/frontend/front
             image: 192.168.0.23:5000/orderhub-frontend
             values: orderhub/values.yaml
-          - name: orderhub
+          - name: orderhub-impulse
             context: orderhub/docker/impulse
             dockerfile: orderhub/docker/impulse/dockerfile
             image: 192.168.0.23:5000/orderhub-impulse
