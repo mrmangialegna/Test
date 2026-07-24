@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: notify-svc-monitor
-  namespace: notifyhub
+  namespace: notify-hub
 spec:
   selector:
     matchLabels:

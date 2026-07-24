@@ -1,8 +1,8 @@
 apiVersion: security.istio.io/v1alpha
 kind: PeerAuthentication
 metadata:
-  name: peerrrrrrr
-  namespace: notifyhub
+  name: peerauth
+  namespace: notify-hub
 spec:
   mtls:
     mode: PERMISSIVE

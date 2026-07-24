@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: notifyhub
+  name: notify-hub
   labels:
     pod-security.kubernetes.io/warn: restricted 
 

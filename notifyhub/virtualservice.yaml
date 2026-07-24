@@ -1,8 +1,8 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: orderhubpro-backend-vs
-  namespace: orderhub-pro
+  name: notify-svc-vs
+  namespace: notify-hub
 spec:
   hosts:
   - notify-svc
