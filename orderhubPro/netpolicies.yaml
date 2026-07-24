@@ -31,7 +31,7 @@ spec:
     matchLabels:
       app: backendpro
   policyTypes:
-  - ingress
+  - Ingress
 
   ingress:
   - from:

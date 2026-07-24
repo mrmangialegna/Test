@@ -13,7 +13,7 @@ spec:
     metadata: 
       labels: 
         app: backendpro
-      version: v1
+        version: v1
     spec:
       
       serviceAccountName: backend-sa

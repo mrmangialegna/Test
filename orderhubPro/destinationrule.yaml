@@ -20,3 +20,8 @@ spec:
         maxPendingRequests: 30
     retries:
       attempts: 3
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50

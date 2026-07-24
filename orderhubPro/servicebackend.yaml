@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: backendpro-svc
   namespace: orderhub-pro
+  labels:
+    app: backendpro-svc
 spec:
   type: ClusterIP
   selector:

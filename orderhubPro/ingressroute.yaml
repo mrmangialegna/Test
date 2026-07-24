@@ -5,7 +5,7 @@ metadata:
   namespace: orderhub-pro
 spec:
   entryPoints:
-    - web
+    - TLS
   routes:
   - match: Host(`orderhub.local`)
     kind: Rule
