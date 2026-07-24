@@ -7,7 +7,7 @@ spec:
   selector:
     matchLabels:
       app: backendpro
-  action: ALLOW  #Oppure DENY
+  action: ALLOW  
   rules:
   - from:
     - source:

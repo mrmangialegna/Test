@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: netpolicy
+  namespace: notifyhub
+spec:
+  podSelector:
+    matchLabels:
+      app: notify-svc
+
+  policyTypes:
+  - Ingress
+
+  ingress:
+  - from:
+    - podSelector:
+      matchLabels:
+        app: notifier-client
+    ports:
+    - protocol: TCP
+      port: 8080

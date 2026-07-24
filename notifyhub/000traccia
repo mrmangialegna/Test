@@ -1,0 +1,33 @@
+Traccia: "NotifyHub" — Coda di notifiche con canary e hardening
+
+Contesto: un servizio che invia notifiche, con due versioni in canary release, hardening completo sui container, e un componente di supporto che scrive log condivisi.
+
+Blocco 1 – Namespace e storage
+
+Namespace notifyhub
+StorageClass notifyhub-fast (provisioner a scelta, volumeBindingMode: WaitForFirstConsumer)
+PVC notifyhub-queue-data da 2Gi che usa quella StorageClass
+
+Blocco 2 – Deployment v1 e v2 (canary)
+
+Deployment notify-v1 (2 repliche) — immagine notifyhub:1.0, label app: notify + version: v1
+Deployment notify-v2 (1 replica) — immagine notifyhub:2.0, label app: notify + version: v2
+Entrambi espongono porta 8080
+Container secondario sidecar-logger (busybox) in entrambi i Deployment, che scrive un timestamp ogni 10 secondi in un file su volume condiviso (emptyDir)
+SecurityContext completo (Pod-level + Container-level) su tutti i container, coerente con restricted PSS
+Uno dei due container principali monta anche il PVC notifyhub-queue-data in sola lettura (readOnly: true nel volumeMount) — l'altro no
+
+Blocco 3 – Service e traffic management
+
+Service notify-svc (ClusterIP, porta 80 → targetPort 8080) che seleziona entrambe le versioni
+DestinationRule con subset v1/v2 e outlierDetection configurato
+VirtualService con split 80% v1 / 20% v2
+
+Blocco 4 – Sicurezza di rete
+
+NetworkPolicy che permette ingresso a notify-svc solo da pod con label role: notifier-client, sulla porta 8080
+PeerAuthentication PERMISSIVE (non STRICT stavolta) solo sul namespace notifyhub
+
+Blocco 5 – Monitoring
+
+ServiceMonitor per notify-svc sulla porta 80, path /metrics, con label sul Service coerenti col selector del ServiceMonitor (occhio a non ripetere l'errore di oggi)

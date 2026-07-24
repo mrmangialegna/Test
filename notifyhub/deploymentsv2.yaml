@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notify-v2
+  namespace: notify-hub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notify-v2
+  template:
+    metadata:
+      labels:
+        app: notify
+        version: v2
+    
+    spec:
+    
+      volumes:
+      - name: shared-logs
+        emptyDir: {}
+
+      serviceAccountName: notify-v2
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RunTimeDefault
+
+      containers:
+      - name: notify-v2
+        image: notifyhub:2.0
+        ports:
+        - containerPort: 8080    
+        
+        resources:
+          limits:
+            memory: 128Mi
+            cpu: 100m
+          requests:
+            memory: 64Mi
+            cpu: 50m
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+      
+      - name: sidecar-logger
+        image: busybox:1.36
+        command:
+        - /bin/sh
+        - -c
+        - |
+          while true; do
+            echo "$(date '+%Y-%m-%d %H:%M:%S') - notify pod alive" >> /var/log/notify/activity.log
+            sleep 10
+          done
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+
+        volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log/notify
+
+        resources:
+          limits:
+            memory: 32Mi
+            cpu: 20m
+          requests:
+            memory: 16Mi
+            cpu: 10m
