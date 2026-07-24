@@ -7,7 +7,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: notify-v2
+      app: notify
   template:
     metadata:
       labels:
@@ -25,7 +25,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
         seccompProfile:
-          type: RunTimeDefault
+          type: RuntimeDefault
 
       containers:
       - name: notify-v2

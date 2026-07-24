@@ -1,4 +1,4 @@
-apiVersion: security.istio.io/v1alpha
+apiVersion: security.istio.io/v1
 kind: PeerAuthentication
 metadata:
   name: peerauth

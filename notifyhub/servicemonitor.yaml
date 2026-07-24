@@ -8,6 +8,6 @@ spec:
     matchLabels:
       app: notify-svc
   endpoints:
-  - port: 80
+  - port: http
     path: /metrics
     interval: 13s

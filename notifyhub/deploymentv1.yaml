@@ -7,7 +7,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: notify-v1
+      app: notify
   template:
     metadata:
       labels:
@@ -19,7 +19,7 @@ spec:
       volumes:
       - name: notify-hub-queue
         persistentVolumeClaim:
-          claimName: notify-hub-queue
+          claimName: notifyhub-queue-data
       - name: shared-logs
         emptyDir: {}
 
@@ -28,7 +28,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
         seccompProfile:
-          type: RunTimeDefault
+          type: RuntimeDefault
 
       containers:
       - name: notify-v1
