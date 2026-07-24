@@ -84,7 +84,7 @@ backend:
   version: v1
   image:
     repository: 192.168.0.23:5000/orderhub-backend
-    tag: dad464800508e290fe0c2b450d77fbd8284491ea
+    tag: d637a4af14f978b9739df74fcde8ad8e16ccc0f2
     pullPolicy: IfNotPresent
   resources:
     requests:
