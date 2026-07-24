@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:  
+  name: orderhubpro-cm
+  namespace: orderhub-pro
+data:
+  db_host: dbpro-svc
+  db_usr: postgres
+  db_port: "5432"
+  db_name: postgres
+  

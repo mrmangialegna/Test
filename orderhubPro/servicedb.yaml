@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbpro-svc
+  namespace: orderhub-pro
+spec:
+  clusterIP: None
+  selector:
+    app: dbpro
+  ports:
+  - port: 5432
+    targetPort: 5432

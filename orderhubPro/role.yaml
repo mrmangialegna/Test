@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: role-backend
+  namespace: orderhub-pro
+rules:
+  - apiGroups: [""]
+    resources: [ "secrets", "configmaps"]
+    verbs: ["get", "list"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: role-frontend
+  namespace: orderhub-pro
+rules:
+  - apiGroups: [""]
+    resources: [ "configmaps"]
+    verbs: ["get", "list"]

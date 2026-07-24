@@ -1,0 +1,16 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: orderhub-pro-route
+  namespace: orderhub-pro
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`orderhub.local`)
+    kind: Rule
+    services:
+    - name: frontpro-svc
+      port: 80
+    middlewares:
+    - name: rate-limit-orderhub

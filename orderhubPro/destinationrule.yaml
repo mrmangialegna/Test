@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: orderhubpro-backend-dr
+  namespace: orderhub-pro
+spec:
+  host: backendpro-svc
+  subsets:
+  - name: v1
+    labels:
+      version: v1  
+  - name: v2
+    labels:
+      version: v2
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 50
+      http:
+        maxPendingRequests: 30
+    retries:
+      attempts: 3

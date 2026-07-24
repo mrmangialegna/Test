@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:  
+  name: netpolicydb
+  namespace: orderhub-pro
+spec:  
+  podSelector:
+    matchLabels:
+      app: dbpro
+  policyTypes:
+  - Ingress
+
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: backendpro
+    ports:
+    - protocol: TCP
+      port: 5432
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:  
+  name: netpolicyback
+  namespace: orderhub-pro
+spec:  
+  podSelector:
+    matchLabels:
+      app: backendpro
+  policyTypes:
+  - ingress
+
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: frontpro
+    ports:
+    - protocol: TCP
+      port: 5000

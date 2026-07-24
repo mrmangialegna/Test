@@ -1,0 +1,126 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backendpro
+  namespace: orderhub-pro
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backendpro
+
+  template:
+    metadata: 
+      labels: 
+        app: backendpro
+      version: v1
+    spec:
+      
+      serviceAccountName: backend-sa
+
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000  
+        seccompProfile:
+          type: RuntimeDefault
+
+      containers:
+      - name: backendpro
+        image: orderhub-backend:latest
+        ports:
+        - containerPort: 5000
+        
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+
+        volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log/postgres
+
+        resources:
+          requests:
+            memory: 64Mi
+            cpu: 100m
+          limits:
+            memory: 256Mi
+            cpu: 250m
+            
+        env:
+        - name: DATABASE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: orderhubpro-cm 
+              key: db_host
+        - name: DATABASE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: orderhubpro-cm
+              key: db_port
+        - name: DATABASE_USER
+          valueFrom:
+            configMapKeyRef:
+              name: orderhubpro-cm
+              key: db_usr  
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: orderhub-pro-secret
+              key: dbpassword
+        - name: DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: orderhubpro-cm
+              key: db_name  
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 10
+
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+
+      - name: log-rotator
+        image: busybox:1.36
+        command:
+        - /bin/sh
+        - -c
+        - |
+          while true; do
+            if [ -f /var/log/postgres/pg.log ] && [ $$(stat -c%s /var/log/postgres/pg.log) -gt 1024000 ]; then
+              mv /var/log/postgres/pg.log "/var/log/postgres/pg.log.$$(date +%Y%m%d%H%M%S)"
+              touch /var/log/postgres/pg.log
+            fi
+            sleep 30
+          done
+        
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+
+        volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log/postgres
+
+        resources:
+          requests:
+            memory: 64Mi
+            cpu: 50m
+          limits:
+            memory: 128Mi
+            cpu: 100m  
+
+      volumes:
+      - name: shared-logs
+        emptyDir: {}
+      
+      
+   

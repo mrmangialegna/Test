@@ -1,0 +1,16 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: backend-access
+  namespace: orderhub-pro
+spec:
+  selector:
+    matchLabels:
+      app: backendpro
+  action: ALLOW  #Oppure DENY
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/orderhub-pro/sa/frontend-sa
+         

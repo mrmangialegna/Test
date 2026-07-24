@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: orderhubpro-backend-vs
+  namespace: orderhub-pro
+spec:
+  hosts:
+  - backendpro-svc
+  http:
+  - route:
+    - destination:
+        host: backendpro-svc
+        subset: v1       
+      weight: 90
+    - destination:
+        host: backendpro-svc
+        subset: v2
+      weight: 10
+           

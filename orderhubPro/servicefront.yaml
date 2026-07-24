@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontpro-svc
+  namespace: orderhub-pro
+spec:
+  type: ClusterIP
+  selector:
+    app: frontpro
+  ports:
+  - port: 80
+    targetPort: 8080
