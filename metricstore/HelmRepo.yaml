@@ -1,0 +1,8 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: metricstore-helm-repo
+  namespace: metricstore
+spec:
+  interval: 10m
+  url: https://helm.github.io/helm/stable/postgres

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metricstore-role-config
+  namespace: metricstore
+data:
+  usr: postgres
+  pwd: postgres
+  port: "5432"
+  db: metricstore-db-hs

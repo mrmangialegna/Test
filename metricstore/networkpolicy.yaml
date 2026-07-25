@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: netpolicy-metricstore
+  namespace: metricstore
+spec:
+  podSelector:
+    matchLabels:
+      app: metricstore-db
+
+  policyTypes:
+  - Ingress
+
+  ingress:
+  - from:
+    - podSelector:
+      matchLabels:
+        app: metricstore-client
+    ports: 
+    - port: 5432
+      protocol: TCP

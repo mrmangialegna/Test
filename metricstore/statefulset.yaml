@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: metricstore-db
+  namespace: metricstore
+spec:
+  replicas: 2
+  serviceName: metricstore-db-hs
+  selector:
+    matchLabels:
+      app: metricstore-db
+  template:
+    metadata:
+      labels:
+        app: metricstore-db
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - metricstore-db
+              topologyKey: kubernetes.io/hostname
+
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+
+      volumes:
+      - name: metricstore-disk
+        persistentVolumeClaim:
+          claimName: metricstore-disk
+
+      containers:
+      - name: metricstore-db
+        image: metricstore-db:2.1
+        ports:
+        - containerPort: 5432
+
+        volumeMounts:
+        - name: metricstore-disk
+          mountPath: /var/lib/postgresql/data
+
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: metricstore-role-config
+              key: usr
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: metricstore-role-config
+              key: pwd
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: metricstore-role-config
+              key: db
