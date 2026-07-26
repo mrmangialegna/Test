@@ -6,6 +6,14 @@ metadata:
   labels:
     {{- include "orderhub.labels" . | nindent 4 }}
     app: {{ .Values.backend.name }}
+  annotations:
+        vault.hashicorp.com/agent-inject: "true" 
+        vault.hashicorp.com/role: "backend-role"  
+        vault.hashicorp.com/agent-inject-secret-database: "orderhub/data/database" 
+        vault.hashicorp.com/agent-inject-template-database: |
+          {{- with secret "orderhub/data/database" -}}
+          {{ .Data.data.password }}
+          {{- end -}} 
 spec:
   replicas: {{ .Values.backend.replicas }}
   selector:
@@ -23,6 +31,11 @@ spec:
       - name: {{ .Values.backend.name }}
         image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
         imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+
+        command: ["/bin/sh", "-c"]
+        args:
+          - export DB_PASSWORD=$(cat /vault/secrets/database) && exec /docker-entrypoint.sh nginx -g "daemon off;"
+          
         resources:
           {{- toYaml .Values.backend.resources | nindent 10 }}
         ports:
@@ -65,8 +78,4 @@ spec:
             configMapKeyRef:
               name: {{ .Values.backend.configMapName }}
               key: log-level
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.backend.secretName }}
-              key: db-password
+        
