@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+
+namespace: minishop-staging
+
+replicas:
+  - name: minishop-backend
+    count: 2
+
+images:
+  - name: ngnix
+    newName: nginx
+    tag: alpine
+  
+configMapGenerator:
+  - name: minishop-config
+    behavior: merge
+    literals:
+      - log_level=debug

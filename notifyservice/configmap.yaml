@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: not-serv-cm
+  namespace: notify-service-ns
+data:
+  host: postgres-shared.staging.svc.cluster.local
+  name: notifydb 
+  port: 5432
+  log: "debug"

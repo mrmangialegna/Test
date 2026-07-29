@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-not-serv
+  namespace: notify-service-ns
+spec:
+  replicas: 2
+  
+  selector:
+    matchLabels:
+      app: backend
+    template:
+      metadata:
+        labels:
+          app: backend
+    spec:
+      containers:
+      - name: backend
+        image: registry.interno/notify-service:1.4.2
+        ports:
+        - containerPort: 8080
+      
+      env:
+      - name: POSTGRES_HOST
+        valueFrom:
+            configMapKeyRef:
+              name: not-serv-cm
+              value: host
+      - name: POSTGRES_USER
+        valueFrom:
+            secretKeyRef:
+              name: secret
+              value: user
+      - name: POSTGRES_PASSWORD
+        valueFrom:
+            secretKeyRef:
+              name: secret
+              value: dbpassword
+      - name: API
+        valueFrom:
+            secretKeyRef:
+              name: secret
+              value: sendgrid-api-key
+      
+      resources:
+        limits:
+          cpu:
+          memory:
+        requests:
+          cpu:
+          memory:

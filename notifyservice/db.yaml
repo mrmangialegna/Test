@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db-not-serv
+  namespace: notify-service-ns
+spec:
+  replicas: 1
+  serviceName: "db-svc"
+  selector:
+    matchLabels:
+      app: db
+    template:
+     metadata:
+       labels:
+         app: db 
+    spec:
+       
+      volumeClaimTemplate:
+        - metadata:
+            name: db-data
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 2Gi
+
+      containers:
+
+      - name: db
+        image: postgres15
+        ports:
+        - containerPort: 5432
+
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name:
+              value:
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name:
+              value:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name:
+              value:
+
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/postgresql/data
+          
+        resources:
+          requests:
+            cpu:
+            memory:
+          limits:
+            cpu:
+            requests:
+

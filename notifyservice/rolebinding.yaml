@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: backend-rb
+  namespace: notify-service-ns
+subjects:
+- kind: ServiceAccount
+  name: backend-sa
+  namespace: notify-service-ns
+roleRef:
+  kind: Role
+  name: roleBackend
+  apiGroup: rbac.authorization.k8s.io
