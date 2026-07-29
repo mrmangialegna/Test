@@ -14,8 +14,8 @@ spec:
   ingress:
   - from:
     - podSelector:
-      matchLabels:
-        app: metricstore-client
+        matchLabels:
+          app: metricstore-client
     ports: 
     - port: 5432
       protocol: TCP
