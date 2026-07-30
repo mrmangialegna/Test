@@ -1,161 +1,109 @@
-# Default values for notifyservice.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+namespace:
+  name: notifyservice
+  environment1: staging
+  environment2: prod
 
-# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
-replicaCount: 1
+resquota:
+  name: notifyserviceresquota
+  rc: "2"
+  rm: "4Gi"
+  lc: "4"
+  lm: "8Gi"
+  count:
+    pods: "10"
+    services: "5"
+    configmaps: "10"
+    secrets: "10"
+    pvcs: "2"
 
-# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
-image:
-  repository: nginx
-  # This sets the pull policy for images.
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  prc: "6"
+  prm: "10Gi"
+  plc: "10"
+  plm: "26Gi"
+  pcount:
+    pods: "20"
+    services: "10"
+    configmaps: "20"
+    secrets:  "20"
+    pvcs: "4"
 
-# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-imagePullSecrets: []
-# This is to override the chart name.
-nameOverride: ""
-fullnameOverride: ""
+limitrange:
+  name: notifyservicelimitrange
+  lm: "512Mi"
+  lc: "500m"
+  dm: "256Mi"
+  dc: "250m"
+  mxc: "2Gi"
+  mxm: "2"
+  mnc: "64Mi"
+  mnm: "100m"
 
-# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Automatically mount a ServiceAccount's API credentials?
-  automount: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
+kreq:
+  name: podpolicies
 
-# This is for setting Kubernetes Annotations to a Pod.
-# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-podAnnotations: {}
-# This is for setting Kubernetes Labels to a Pod.
-# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-podLabels: {}
+kreq1:
+  name: require-requests-limits
+  annotations: 
+    policies.kyverno.io/title: "Require Resource and limits"
+    policies.kyverno.io/category: "Best Practice"
+    policies.kyverno.io/severity: "medium"
+    policies.kyverno.io/description: "Check resources and limits as policy."
+  val: "?"
 
-podSecurityContext: {}
-  # fsGroup: 2000
+kreq2:
+  name: not-latest-as-label
+  annotations:
+    policies.kyverno.io/title: "No latest as tag"
+    policies.kyverno.io/category: "Best Practice"
+    policies.kyverno.io/severity: "medium"
+    policies.kyverno.io/description: "No :latest as image tag"
+  val: "*:*"
+  val2: "!*:latest"
 
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+kreq3:
+  name: require-nonroot
+  annotations:
+    policies.kyverno.io/title: "Non root"
+    policies.kyverno.io/category: "Best Practice"
+    policies.kyverno.io/severity: "medium"
+    policies.kyverno.io/description: "Container obliged in non-root usr"
+  val: true
 
-# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
-service:
-  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
-  type: ClusterIP
-  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
-  port: 80
+kreq4:
+  name: required-labels
+  annotations:
+    policies.kyverno.io/title: "Label Required for NS and Pods"
+    policies.kyverno.io/category: "Best Practice"
+    policies.kyverno.io/severity: "medium"
+    policies.kyverno.io/description: "Must-have-label Namespace&Pods Policy"
+  val: "staging | production"
 
-# This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
-ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+kreq5:
+  name: rollingupdate
+  annotations:
+    policies.kyverno.io/title: "RollingUpdate policy"
+    policies.kyverno.io/category: "Best Practice"
+    policies.kyverno.io/severity: "medium"
+    policies.kyverno.io/description: "Define quotas"
+  val: "!0"
 
-# -- Expose the service via gateway-api HTTPRoute
-# Requires Gateway API resources and suitable controller installed within the cluster
-# (see: https://gateway-api.sigs.k8s.io/guides/)
-httpRoute:
-  # HTTPRoute enabled.
-  enabled: false
-  # HTTPRoute annotations.
-  annotations: {}
-  # Which Gateways this Route is attached to.
-  parentRefs:
-  - name: gateway
-    sectionName: http
-    # namespace: default
-  # Hostnames matching HTTP header.
-  hostnames:
-  - chart-example.local
-  # List of rules and filters applied.
-  rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /headers
-  #   filters:
-  #   - type: RequestHeaderModifier
-  #     requestHeaderModifier:
-  #       set:
-  #       - name: My-Overwrite-Header
-  #         value: this-is-the-only-value
-  #       remove:
-  #       - User-Agent
-  # - matches:
-  #   - path:
-  #       type: PathPrefix
-  #       value: /echo
-  #     headers:
-  #     - name: version
-  #       value: v2
+kreq6:
+  name: pvc-size-limit
+  annotations:
+    policies.kyverno.io/title: "PVC size limit"
+    policies.kyverno.io/category: "Best Practice"
+    policies.kyverno.io/severity: "medium"
+    policies.kyverno.io/description: "Defined and limited PVC size"
+  val: "<=30Gi"
 
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+storageClass:
+  name: storage-ssd
+  provisioner: kubernetes.io/no-provisioner
+  reclaimPolicy: Retain
+  volumeBindingMode: Immediate
+  allowVolumeExpansion: true
 
-# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-livenessProbe:
-  httpGet:
-    path: /
-    port: http
-readinessProbe:
-  httpGet:
-    path: /
-    port: http
-
-# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
-
-# Additional volumes on the output Deployment definition.
-volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
-
-# Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
+hpa:
+  name: hps-notifyservice
+  min: "2"
+  max: "10"

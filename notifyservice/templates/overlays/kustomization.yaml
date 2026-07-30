@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+
+metadata:
+  name:
+  labels:
+    environment: {{ .Values.namespace.environment2 }}
+  
+spec:
+  template:
+    metadata:
+      labels:
+        app: notify-service
+        environment: {{ .Values.namespace.environment2 }}

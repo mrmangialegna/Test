@@ -1,0 +1,36 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ .Values.kreq4.name }}
+  annotations:
+{{ toYaml .Values.kreq4.annotations | indent 4}}
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+
+  - name: {{ .Values.kreq4.name }}
+    match: 
+      any:
+      - resources:
+          kinds:
+          - Namespace
+    validate:
+      message: "Namespace must have labels"
+      pattern:
+        metadata:
+          labels:
+            environment: {{ .Values.kreq4.val }}
+  
+  - name: {{ .Values.kreq4.name }}
+    match: 
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: "Pods must have labels"
+      pattern:
+        metadata:
+          labels:
+            environment: {{ .Values.kreq4.val }}

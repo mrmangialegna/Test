@@ -1,0 +1,135 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ .Values.kreq.name }}
+  annotations:
+{{ merge .Values.kreq1.annotations .Values.kreq2.annotations .Values.kreq3.annotations .Values.kreq5.annotations | toYaml | indent 4 }}
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+
+  - name: {{ .Values.kreq1.name }}
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+      validate:
+        message: {{ .Values.kreq1.annotations.policies.kyverno.io/description }}
+        pattern:
+          spec:
+            containers:
+            - resources:
+                requests:
+                  memory: {{ .Values.kreq.val }}
+                  cpu: {{ .Values.kreq.val }}
+                limits:
+                  memory: {{ .Values.kreq.val }}
+                  cpu: {{ .Values.kreq.val }}
+            =(initContainers):
+            - resources:
+                requests: 
+                  memory: {{ .Values.kreq.val }}
+                  cpu: {{ .Values.kreq.val }}
+                limits:
+                  memory: {{ .Values.kreq.val }}
+                  cpu: {{ .Values.kreq.val }}
+            =(ephemeralContainers):
+            - resources:
+                requests: 
+                  memory: {{ .Values.kreq.val }}
+                  cpu: {{ .Values.kreq.val }}
+                limits:
+                  memory: {{ .Values.kreq.val }}
+                  cpu: {{ .Values.kreq.val }}
+  
+  - name: {{ .Values.kreq5.name }}
+    match:
+      any:
+      - resources:
+        kinds:
+        - Deployment
+    validate:
+      message: {{ .Values.kreq5.annotations.policies.kyverno.io/description }}
+      pattern:
+        spec:
+          strategy:
+            type: RollingUpdate
+            rollingUpdate:
+              maxUnavailable: 0
+              maxSurge: {{ .Values.kreq5.val}}
+  
+  - name: {{ .Values.kreq3.name }}
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: {{ .Values.kreq3.annotations.policies.kyverno.io/description }}
+      anyPattern:
+
+      - spec:
+          securityContext:
+            runAsNonRoot: {{ .Values.kreq3.val }}
+          =(initContainers):
+          - =(securityContext):
+              =(runAsNonRoot): {{ .Values.kreq3.val }}
+          containers:
+          - =(securityContext):
+              =(runAsNonRoot): {{ .Values.kreq3.val }}
+          =(ephemeralContainers):
+          - =(securityContext):
+              =(runAsNonRoot): {{ .Values.kreq3.val }}
+
+      - spec:
+          =(initContainers):
+          - securityContext:
+              runAsNonRoot: {{ .Values.kreq3.val }}
+          containers:
+          - securityContext:
+              runAsNonRoot: {{ .Values.kreq3.val }}
+          =(ephemeralContainers):
+          - securityContext:
+              runAsNonRoot: {{ .Values.kreq3.val }}
+
+  - name: {{ .Values.kreq2.name }}
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: {{ .Values.kreq2.annotations.policies.kyverno.io/description }}
+      foreach:
+      - list: "request.object.spec.containers"
+        pattern:
+          image: {{ .Values.kreq2.val }}
+      - list: "request.object.spec.initContainers"
+        pattern:
+          image: {{ .Values.kreq2.val }}
+      - list: "request.object.spec.ephemeralContainers"
+        pattern:
+          image: {{ .Values.kreq2.val }}
+
+  - name: validate-image-tag
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: {{ .Values.kreq2.annotations.policies.kyverno.io/description }}
+      foreach:
+      - list: "request.object.spec.containers"
+        pattern:
+          image: {{ .Values.kreq2.val2 }}
+      - list: "request.object.spec.initContainers"
+        pattern:
+          image: {{ .Values.kreq2.val2 }}
+      - list: "request.object.spec.ephemeralContainers"
+        pattern:
+          image: {{ .Values.kreq2.val2 }}
+
+  

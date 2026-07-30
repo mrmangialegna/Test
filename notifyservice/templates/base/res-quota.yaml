@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: {{ .Values.resquota.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  hard:
+    requests.cpu: {{ .Values.resquota.rc }}
+    requests.memory: {{ .Values.resquota.rm }}
+     limits.cpu: {{ .Values.resquota.lc }}
+    limits.memory: {{ .Values.resquota.lm }}
+
+    pods: {{ .Values.resquota.count.pods }}
+    services: {{ .Values.resquota.count.services }}
+    configmaps: {{ .Values.resquota.count.configmaps }}
+    secrets: {{ .Values.resquota.count.secrets }}
+    persistentvolumeclaims: {{ .Values.resquota.count.pvcs }}

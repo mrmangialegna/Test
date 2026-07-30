@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - kyverno/podpolicies.yaml
+  - kyverno/pvcpolicy.yaml
+  - kyverno/labelpolicy.yaml
+  - storageclass.yaml
+  - namespace.yaml
+  - limitrange.yaml
+  - res-quota.yaml
+  

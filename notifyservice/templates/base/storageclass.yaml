@@ -1,0 +1,11 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ .Values.storageclass.name }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    environment: {{ .Values.namespace.environment1 }}
+provisioner: {{ .Values.storageclass.provisioner }}
+reclaimPolicy: {{ .Values.storageclass.reclaimPolicy }}
+volumeBindingMode: {{ .Values.storageclass.volumeBindingMode }}
+allowVolumeExpansion: {{ .Values.storageclass.allowVolumeExpansion }}
