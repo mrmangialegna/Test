@@ -113,7 +113,7 @@ spec:
         pattern:
           image: {{ .Values.kreq2.val }}
 
-  - name: validate-image-tag
+  - name: {{ .Values.kreq2.name }}
     match:
       any:
       - resources:

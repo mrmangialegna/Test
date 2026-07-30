@@ -16,7 +16,7 @@ spec:
           kinds:
           - Namespace
     validate:
-      message: "Namespace must have labels"
+      message: {{ .Values.kreq4..policies.kyverno.io/description }}
       pattern:
         metadata:
           labels:
@@ -29,7 +29,7 @@ spec:
           kinds:
           - Pod
     validate:
-      message: "Pods must have labels"
+      message: {{ .Values.kreq4..policies.kyverno.io/description }}
       pattern:
         metadata:
           labels:
