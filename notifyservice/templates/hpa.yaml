@@ -17,4 +17,20 @@ spec:
       name: cpu
       target:
         type: Utilization
-        averageUtilizazion:
+        averageUtilizazion: {{ .Values.hpa.average }}
+  
+  behavior:
+    scaleDown:
+      selectPolicy: {{ .Values.hpa.policy2 }}
+      stabilizationWindowSeconds: {{ .Values.hpa.dwin }}
+      policies:
+      - type: Pods
+        value: {{ .Values.hpa.sdown }}
+        periodSeconds: {{ .Values.hpa.downps }}
+    scaleUp:
+      selectPolicy: {{ .Values.hpa.policy }}
+      stabilizationWindowSeconds: {{ .Values.hpa.uwin }}
+      policies:
+      - type: Pods
+        value: {{ .Values.hpa.updown }}
+        periodSeconds: {{ .Values.hpa.upps }}

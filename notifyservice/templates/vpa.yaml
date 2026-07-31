@@ -1,0 +1,22 @@
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: {{ .Values.vpa.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: notify-service
+  updatePolicy:
+    updateMode: {{ .Values.vpa.mode }} 
+  resourcePolicy:
+    containerPolicies:
+    - containerName: notify-container
+      minAllowed:
+        cpu: {{ .Values.vpa.resourcePolicy.containerPolicies.minAllowed.cpu }}
+        memory: {{ .Values.vpa.resourcePolicy.containerPolicies.minAllowed.memory }}
+      maxAllowed:
+        cpu: {{ .Values.vpa.resourcePolicy.containerPolicies.maxAllowed.cpu }}
+        memory: {{ .Values.vpa.resourcePolicy.containerPolicies.maxAllowed.memory }}
+      controlledResources: {{ .Values.vpa.resourcePolicy.containerPolicies.controlledResources }} 
